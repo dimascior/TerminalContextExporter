@@ -1,24 +1,99 @@
 #!/bin/bash
-# Claude's WSL PowerShell Launcher
+# Claude's WSL PowerShell Launcher - Phase 7 Enhanced
 # Extends GuardRails.md Part 10 workflow into WSL environment
-# Enables cross-interpreter testing from Linux
+# Phase 7: WSLENV context propagation and terminal integration
 
-echo "=== CLAUDE WSL POWERSHELL LAUNCHER ==="
+echo "=== CLAUDE WSL POWERSHELL LAUNCHER (Phase 7) ==="
 echo "Environment: $(uname -a)"
 echo "Working Directory: $(pwd)"
 echo "WSL Distribution: ${WSL_DISTRO_NAME:-'Not in WSL'}"
+
+# Phase 7.1: WSLENV context propagation setup
+echo
+echo "=== Phase 7: Environment Context Propagation ==="
+
+# Set up WSLENV for cross-boundary context passing
+export WSLENV="MYEXPORTER_CORRELATION_ID/u:MYEXPORTER_TERMINAL_MODE/u:MYEXPORTER_WSL_CONTEXT/u"
+
+# Generate correlation ID if not provided
+if [ -z "$MYEXPORTER_CORRELATION_ID" ]; then
+    export MYEXPORTER_CORRELATION_ID=$(uuidgen 2>/dev/null || echo "$(date +%s)-$$-$(($RANDOM * $RANDOM))")
+fi
+
+# Set terminal context indicators
+export MYEXPORTER_TERMINAL_MODE="${MYEXPORTER_TERMINAL_MODE:-enhanced}"
+export MYEXPORTER_WSL_CONTEXT="true"
+
+echo "Correlation ID: $MYEXPORTER_CORRELATION_ID"
+echo "Terminal Mode: $MYEXPORTER_TERMINAL_MODE"
+echo "WSL Context: $MYEXPORTER_WSL_CONTEXT"
+
+# Phase 7: Terminal capability detection
+echo
+echo "=== Terminal Capabilities Detection ==="
+detect_terminal_capabilities() {
+    local capabilities=""
+    
+    # Check for tmux
+    if command -v tmux >/dev/null 2>&1; then
+        capabilities="tmux"
+        echo "✓ tmux available: $(tmux -V 2>/dev/null || echo 'unknown version')"
+        
+        # Check if tmux server is running
+        if tmux has-session 2>/dev/null; then
+            echo "  └─ tmux server running with $(tmux list-sessions 2>/dev/null | wc -l) sessions"
+        else
+            echo "  └─ tmux server not running"
+        fi
+    else
+        echo "○ tmux not available"
+    fi
+    
+    # Check for screen
+    if command -v screen >/dev/null 2>&1; then
+        capabilities="${capabilities:+$capabilities,}screen"
+        echo "✓ screen available: $(screen -v 2>/dev/null | head -1 || echo 'unknown version')"
+    else
+        echo "○ screen not available"
+    fi
+    
+    # Check for bash
+    if command -v bash >/dev/null 2>&1; then
+        capabilities="${capabilities:+$capabilities,}bash"
+        echo "✓ bash available: $BASH_VERSION"
+    else
+        echo "○ bash not available"
+    fi
+    
+    export MYEXPORTER_TERMINAL_CAPABILITIES="$capabilities"
+    echo "Terminal capabilities: $capabilities"
+    
+    return 0
+}
+
+detect_terminal_capabilities
 echo
 
-# Function to execute Windows PowerShell from WSL
+# Function to execute Windows PowerShell from WSL with enhanced context
 execute_powershell() {
     local command="$1"
     local description="$2"
+    local terminal_mode="${3:-normal}"
     
-    echo "[EXEC] $description"
+    echo "[EXEC] $description (Terminal Mode: $terminal_mode)"
     echo "[CMD]  $command"
+    echo "[CTX]  Correlation ID: $MYEXPORTER_CORRELATION_ID"
+    
+    # Phase 7: Set terminal-specific environment for PowerShell execution
+    export MYEXPORTER_TERMINAL_MODE="$terminal_mode"
+    
+    # Phase 7: Enhanced command execution with context propagation
+    local windows_pwd
+    windows_pwd=$(wslpath -w "$(pwd)")
     
     # Use cmd.exe to execute the batch file that runs PowerShell
-    cmd.exe /c "cd /d \"$(wslpath -w "$(pwd)")\" && claude-powershell-bridge.bat"
+    # The WSLENV variables will be automatically propagated
+    cmd.exe /c "cd /d \"$windows_pwd\" && claude-powershell-bridge.bat"
     
     local exit_code=$?
     if [ $exit_code -eq 0 ]; then

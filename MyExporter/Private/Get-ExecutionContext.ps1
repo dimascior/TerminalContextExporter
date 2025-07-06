@@ -99,11 +99,15 @@ function Get-ExecutionContext {
             }
         }
         
-        # Available Commands
+        # Available Commands (Phase 6.2: Enhanced with terminal capabilities)
         $context.Commands = @{}
         $commonCommands = @('git', 'docker', 'python', 'python3', 'node', 'npm')
         
-        foreach ($cmd in $commonCommands) {
+        # Phase 6.2: Terminal-specific command detection
+        $terminalCommands = @('bash', 'tmux', 'wsl', 'screen')
+        $allCommands = $commonCommands + $terminalCommands
+        
+        foreach ($cmd in $allCommands) {
             try {
                 $cmdInfo = Get-Command $cmd -ErrorAction SilentlyContinue
                 if ($cmdInfo) {
@@ -119,6 +123,48 @@ function Get-ExecutionContext {
             catch {
                 $context.Commands[$cmd] = @{ Available = $false; Error = $_.Exception.Message }
             }
+        }
+        
+        # Phase 6.2: Terminal Capabilities Assessment
+        $context.TerminalCapabilities = @{
+            HasBash = $context.Commands.bash.Available
+            HasTmux = $context.Commands.tmux.Available
+            HasWSL = $context.Commands.wsl.Available -or $context.Platform.IsWSL
+            HasScreen = $context.Commands.screen.Available
+            CanUsePersistentSessions = $false
+            Platform = "None"
+            Reason = "No terminal capabilities detected"
+        }
+        
+        # Determine best terminal platform
+        if ($context.Platform.IsWSL -and $context.Commands.tmux.Available) {
+            $context.TerminalCapabilities.CanUsePersistentSessions = $true
+            $context.TerminalCapabilities.Platform = "WSL"
+            $context.TerminalCapabilities.Reason = "WSL with tmux available"
+        } elseif ($context.Platform.IsLinux -and $context.Commands.tmux.Available) {
+            $context.TerminalCapabilities.CanUsePersistentSessions = $true
+            $context.TerminalCapabilities.Platform = "Linux"
+            $context.TerminalCapabilities.Reason = "Linux with tmux available"
+        } elseif ($context.Platform.IsWindows -and $context.Commands.wsl.Available) {
+            # Check if WSL has tmux
+            try {
+                $wslTmuxCheck = & wsl which tmux 2>$null
+                if ($wslTmuxCheck) {
+                    $context.TerminalCapabilities.CanUsePersistentSessions = $true
+                    $context.TerminalCapabilities.Platform = "WSL"
+                    $context.TerminalCapabilities.Reason = "Windows with WSL+tmux available"
+                } else {
+                    $context.TerminalCapabilities.Platform = "WSL-Basic"
+                    $context.TerminalCapabilities.Reason = "Windows with WSL (no tmux)"
+                }
+            } catch {
+                $context.TerminalCapabilities.Platform = "WSL-Unknown"
+                $context.TerminalCapabilities.Reason = "Windows with WSL (tmux status unknown)"
+            }
+        } elseif ($context.Commands.screen.Available) {
+            $context.TerminalCapabilities.CanUsePersistentSessions = $true
+            $context.TerminalCapabilities.Platform = "Screen"
+            $context.TerminalCapabilities.Reason = "GNU Screen available"
         }
         
         return $context

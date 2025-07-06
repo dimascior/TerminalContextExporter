@@ -1,0 +1,245 @@
+# terminal-deny.yaml - TasksV4 Phase 2.1
+# Created: July 6, 2025
+# Framework: GuardRails.md Security-First Design
+# Purpose: Command safety rules and patterns for terminal integration
+
+# Terminal Command Safety Policy v1.0
+version: "1.0"
+policy_name: "terminal-deny"
+description: "Security policy for MyExporter terminal integration - defines prohibited commands and patterns"
+created: "2025-07-06"
+updated: "2025-07-06"
+
+# Security Categories
+security_levels:
+  BLOCK: "Completely prohibited - will cause immediate failure"
+  WARN: "Dangerous - requires explicit approval"
+  SANITIZE: "Requires input sanitization"
+  ALLOW: "Safe for execution"
+
+# Command Blacklist - BLOCK level
+blocked_commands:
+  # System Control
+  - "sudo"
+  - "su"
+  - "doas"
+  - "pkexec"
+  
+  # File System Dangerous Operations
+  - "rm -rf"
+  - "rm -fr"
+  - "del /s"
+  - "rmdir /s"
+  - "format"
+  - "fdisk"
+  - "mkfs"
+  - "dd"
+  
+  # Network Security
+  - "nc"
+  - "netcat"
+  - "ncat"
+  - "telnet"
+  - "ftp"
+  - "wget"
+  - "curl"
+  
+  # Process Control
+  - "kill -9"
+  - "killall"
+  - "taskkill /f"
+  - "shutdown"
+  - "reboot"
+  - "halt"
+  - "poweroff"
+  
+  # System Modification
+  - "crontab"
+  - "at"
+  - "systemctl"
+  - "service"
+  - "chkconfig"
+  - "update-rc.d"
+  
+  # Privilege Escalation
+  - "chmod +s"
+  - "chmod 4755"
+  - "chown root"
+  - "passwd"
+  - "adduser"
+  - "useradd"
+  - "usermod"
+
+# Pattern Blacklist - Regex patterns for BLOCK level
+blocked_patterns:
+  # Command injection attempts
+  - ".*;.*"        # Command chaining
+  - ".*&&.*"       # AND chaining
+  - ".*\\|\\|.*"   # OR chaining
+  - ".*\\|.*"      # Pipe to dangerous command
+  - ".*>.*"        # Output redirection
+  - ".*<.*"        # Input redirection
+  - ".*`.*`.*"     # Command substitution (backticks)
+  - ".*\\$\\(.*\\).*"  # Command substitution $(...)
+  
+  # Path traversal
+  - ".*\\.\\..*"   # Directory traversal
+  - ".*/etc/.*"    # System config access
+  - ".*/proc/.*"   # Process filesystem
+  - ".*/sys/.*"    # System filesystem
+  - ".*/dev/.*"    # Device files
+  
+  # Environment manipulation
+  - ".*export.*PATH.*"     # PATH manipulation
+  - ".*unset.*PATH.*"      # PATH removal
+  - ".*LD_PRELOAD.*"       # Library preloading
+  - ".*LD_LIBRARY_PATH.*"  # Library path manipulation
+
+# Warning Commands - WARN level (require explicit approval)
+warning_commands:
+  - "git"          # Version control (could modify files)
+  - "npm"          # Package manager (could install malicious packages)
+  - "pip"          # Python package manager
+  - "docker"       # Container management
+  - "kubectl"      # Kubernetes control
+  - "ansible"      # Configuration management
+  - "terraform"    # Infrastructure as code
+
+# Commands requiring sanitization - SANITIZE level
+sanitize_commands:
+  - "echo"         # Could be used for injection
+  - "printf"       # Format string vulnerabilities
+  - "cat"          # File reading (validate paths)
+  - "less"         # File viewing (validate paths)
+  - "tail"         # File monitoring (validate paths)
+  - "head"         # File reading (validate paths)
+  - "find"         # File searching (validate paths)
+  - "grep"         # Text searching (validate patterns)
+
+# Allowed Commands - ALLOW level (generally safe)
+allowed_commands:
+  - "ls"
+  - "dir"
+  - "pwd"
+  - "date"
+  - "whoami"
+  - "id"
+  - "uname"
+  - "hostname"
+  - "uptime"
+  - "df"
+  - "free"
+  - "ps"
+  - "top"
+  - "htop"
+  - "which"
+  - "where"
+  - "type"
+  - "help"
+  - "man"
+  - "info"
+  - "echo"
+  - "history"
+  - "alias"
+
+# Character Blacklist - Individual characters that require escaping
+dangerous_characters:
+  - ";"      # Command separator
+  - "&"      # Background execution / command chaining
+  - "|"      # Pipe
+  - ">"      # Redirection
+  - "<"      # Input redirection
+  - "`"      # Command substitution
+  - "$"      # Variable expansion (context-dependent)
+  - "'"      # Single quote (potential injection)
+  - "\""     # Double quote (potential injection)
+  - "\\"     # Escape character
+  - "\n"     # Newline (potential multiline injection)
+  - "\r"     # Carriage return
+  - "\t"     # Tab (potential format confusion)
+
+# Safe Character Whitelist - Characters that are always safe
+safe_characters:
+  - "a-zA-Z"   # Letters
+  - "0-9"      # Numbers
+  - " "        # Space
+  - "-"        # Dash
+  - "_"        # Underscore
+  - "."        # Period
+  - "/"        # Forward slash (paths)
+  - ":"        # Colon
+  - "="        # Equals
+
+# Path Validation Rules
+path_rules:
+  # Allowed path prefixes
+  allowed_prefixes:
+    - "/tmp"
+    - "/home"
+    - "/mnt/c/Users"     # WSL Windows access
+    - "/var/log"         # Log files (read-only)
+    - "."                # Current directory (relative)
+    - "./"               # Explicit relative
+    
+  # Blocked path prefixes  
+  blocked_prefixes:
+    - "/etc"             # System configuration
+    - "/proc"            # Process filesystem
+    - "/sys"             # System filesystem
+    - "/dev"             # Device files
+    - "/boot"            # Boot files
+    - "/root"            # Root home directory
+    - "/bin"             # System binaries
+    - "/sbin"            # System admin binaries
+    - "/usr/bin"         # User binaries
+    - "/usr/sbin"        # User admin binaries
+
+# Environment Variable Rules
+environment_rules:
+  # Protected variables that should not be modified
+  protected_vars:
+    - "PATH"
+    - "LD_PRELOAD"
+    - "LD_LIBRARY_PATH"
+    - "SHELL"
+    - "HOME"
+    - "USER"
+    - "SUDO_USER"
+    
+  # Variables safe to modify
+  safe_vars:
+    - "MYEXPORTER_*"     # MyExporter namespace
+    - "TERM"             # Terminal type
+    - "LANG"             # Language settings
+    - "TZ"               # Timezone
+
+# Validation Settings
+validation:
+  max_command_length: 1000      # Maximum characters in a command
+  max_arguments: 50             # Maximum number of arguments
+  timeout_seconds: 30           # Command execution timeout
+  enable_logging: true          # Log all command attempts
+  enable_monitoring: true       # Monitor command execution
+  
+# Enforcement Actions
+enforcement:
+  on_blocked_command:
+    action: "REJECT"
+    log_level: "ERROR"
+    message: "Command blocked by security policy"
+    
+  on_warning_command:
+    action: "PROMPT"
+    log_level: "WARN" 
+    message: "Potentially dangerous command - approval required"
+    
+  on_sanitize_required:
+    action: "SANITIZE"
+    log_level: "INFO"
+    message: "Command requires input sanitization"
+    
+  on_policy_violation:
+    action: "REJECT"
+    log_level: "ERROR"
+    message: "Command violates security policy"
+    correlate_with_telemetry: true

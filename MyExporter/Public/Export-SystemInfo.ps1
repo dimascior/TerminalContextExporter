@@ -3,7 +3,7 @@
 <# .SYNOPSIS, .DESCRIPTION, etc. as you defined #>
 function Export-SystemInfo {
     [CmdletBinding(SupportsShouldProcess = $true)]
-    [OutputType([SystemInfo])]
+    [OutputType([PSCustomObject])]
     param(
         [Parameter(Mandatory, ValueFromPipeline)] [string[]]$ComputerName,
         [Parameter(Mandatory)] [string]$OutputPath,

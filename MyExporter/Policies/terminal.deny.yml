@@ -1,0 +1,104 @@
+# Terminal Command Deny List Policy
+# This file defines security policies for terminal command validation
+# Used by Test-CommandSafety.ps1 to prevent dangerous command execution
+
+version: "1.0"
+description: "Security policy for terminal command validation in MyExporter"
+
+# Commands that are completely forbidden
+denied_commands:
+  # File system operations that could cause damage
+  - "rm -rf"
+  - "del /s"
+  - "rmdir /s"
+  - "format"
+  - "fdisk"
+  - "mkfs"
+  
+  # Network operations that could be malicious
+  - "curl"
+  - "wget"
+  - "nc"
+  - "netcat"
+  - "telnet"
+  - "ssh"
+  - "scp"
+  - "rsync"
+  
+  # System modification commands
+  - "sudo"
+  - "su"
+  - "passwd"
+  - "chmod 777"
+  - "chown"
+  - "mount"
+  - "umount"
+  
+  # Process manipulation
+  - "kill -9"
+  - "killall"
+  - "pkill"
+  
+  # Package management (could install malware)
+  - "apt install"
+  - "yum install"
+  - "pip install"
+  - "npm install"
+
+# Patterns that indicate potential command injection
+injection_patterns:
+  - ";"
+  - "&&"
+  - "||"
+  - "|"
+  - "$("
+  - "`"
+  - "eval"
+  - "exec"
+
+# Commands that are allowed for system information gathering
+allowed_commands:
+  - "ps"
+  - "top"
+  - "df"
+  - "free"
+  - "uptime"
+  - "uname"
+  - "whoami"
+  - "id"
+  - "pwd"
+  - "ls"
+  - "cat /proc/cpuinfo"
+  - "cat /proc/meminfo"
+  - "cat /proc/version"
+  - "tmux"
+  - "echo"
+
+# Maximum command length to prevent buffer overflow attempts
+max_command_length: 1000
+
+# Whether to log all command attempts for audit purposes
+audit_logging: true
+
+# Tmux-specific policies
+tmux:
+  # Maximum number of sessions allowed
+  max_sessions: 10
+  
+  # Session name pattern (alphanumeric + hyphens only)
+  session_name_pattern: "^[a-zA-Z0-9-_]+$"
+  
+  # Maximum session lifetime in minutes
+  max_session_lifetime: 60
+  
+  # Commands allowed within tmux sessions
+  allowed_in_tmux:
+    - "ps aux"
+    - "df -h"
+    - "free -h"
+    - "uptime"
+    - "uname -a"
+    - "cat /proc/cpuinfo"
+    - "cat /proc/meminfo"
+    - "echo"
+    - "exit"

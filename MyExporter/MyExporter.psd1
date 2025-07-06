@@ -20,6 +20,21 @@
     # RULE: These are the only external modules this project depends on.
     RequiredModules = @()
 
+    # FileList - Complete enumeration of all shipping files
+    FileList = @(
+        'MyExporter.psm1',
+        'Classes/SystemInfo.ps1',
+        'Classes/TmuxSessionReference.ps1',
+        'Private/_Initialize.ps1',
+        'Private/Assert-ContextPath.ps1',
+        'Private/Get-ExecutionContext.ps1',
+        'Private/Get-SystemInfo.Windows.ps1',
+        'Private/Get-SystemInfo.Linux.ps1', 
+        'Private/Get-SystemInfoPlatformSpecific.ps1',
+        'Private/Invoke-WithTelemetry.ps1',
+        'Public/Export-SystemInfo.ps1'
+    )
+
     # --- Module Metadata ---
     ModuleVersion = '1.0.0'
     Author = 'AI-Assisted Engineering'
@@ -30,6 +45,7 @@
     PrivateData = @{
         PSData = @{
             Tags = @('Exporter', 'SystemInfo', 'CrossPlatform', 'ContextAware', 'AI')
+            Prerelease = 'alpha.4'
         }
     }
 }
