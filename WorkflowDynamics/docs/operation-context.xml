@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OperationManifest>
+    <Goal>Complete MyExporter GuardRails Dynamic Architecture Implementation</Goal>
+    <CurrentPhase>Critical Job Integration and End-to-End Validation</CurrentPhase>
+    <FilesInvolved>
+        <File>Public/Export-SystemInfo.ps1</File>
+        <File>Private/Invoke-WithTelemetry.ps1</File>
+        <File>Private/Get-SystemInfoPlatformSpecific.ps1</File>
+        <File>Private/Get-SystemInfo.Windows.ps1</File>
+        <File>Private/Get-SystemInfo.Linux.ps1</File>
+        <File>Classes/SystemInfo.ps1</File>
+        <File>Private/Get-ExecutionContext.ps1</File>
+    </FilesInvolved>
+    <ArchitectureRules>
+        <Rule>Splat $Forward - All public cmdlets pass state via @Forward</Rule>
+        <Rule>No Mutable $using - Immutable objects in parallel blocks</Rule>
+        <Rule>Cross-platform path resolution with Join-Path</Rule>
+        <Rule>Job-safe function loading via ArgumentList</Rule>
+        <Rule>Correlation ID propagation through scope chain</Rule>
+        <Rule>Selective telemetry wrapping, not universal injection</Rule>
+        <Rule>FastPath escape hatches for development efficiency</Rule>
+    </ArchitectureRules>
+    <CurrentStep>1</CurrentStep>
+    <TotalSteps>4</TotalSteps>
+    <Environment>
+        <Platform>Windows</Platform>
+        <PowerShell>Core</PowerShell>
+        <WorkingDirectory>c:\Users\dimas\Desktop\WorkflowDynamics\MyExporter</WorkingDirectory>
+        <FrameworkVersion>Dynamic &amp; Adaptive Architecture v2</FrameworkVersion>
+    </Environment>
+    <ComplianceStatus>
+        <Overall>82%</Overall>
+        <Target>95%</Target>
+        <CriticalTasks>
+            <Task>Job Execution Integration</Task>
+            <Task>End-to-End Workflow Validation</Task>
+            <Task>Telemetry in Job Contexts</Task>
+            <Task>Context Persistence Implementation</Task>
+        </CriticalTasks>
+    </ComplianceStatus>
+    <InterestingAspects>
+        <Aspect>Cross-RunSpace Variable Flow Engineering</Aspect>
+        <Aspect>Environmental Blindness Resolution</Aspect>
+        <Aspect>Anti-Tail-Chasing Pattern Application</Aspect>
+        <Aspect>Living Architecture Self-Documentation</Aspect>
+        <Aspect>AI-Human Collaboration Framework</Aspect>
+    </InterestingAspects>
+    <Timestamp>2025-07-05T00:00:00Z</Timestamp>
+</OperationManifest>

@@ -1,0 +1,45 @@
+# PowerShell specific
+*.ps1xml
+*.psc1
+*.vscode/
+
+# Test output files
+test-output*.csv
+test-output*.json
+final-test*.csv
+final-test*.json
+
+# Temporary files
+*.tmp
+*.temp
+.temp/
+
+# Logs
+*.log
+logs/
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+bin/
+obj/
+dist/
+build/
+
+# Package files
+*.nupkg
+*.zip
+
+# Backup files
+*.bak
+*.backup
+*~
