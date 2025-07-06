@@ -39,6 +39,9 @@ build/
 *.nupkg
 *.zip
 
+# docs files
+project-documentation.md
+
 # Backup files
 *.bak
 *.backup
