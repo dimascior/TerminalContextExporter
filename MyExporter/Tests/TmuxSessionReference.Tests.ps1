@@ -8,7 +8,7 @@ Describe "TmuxSessionReference Class Autoloading" {
         Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
     }
     
-    It "Should have TmuxSessionReference class available after module import" -Pending {
+    It "Should have TmuxSessionReference class available after module import" {
         # Clean import with forced reload
         Import-Module $ModulePath -Force
         
@@ -24,7 +24,7 @@ Describe "TmuxSessionReference Class Autoloading" {
         $ModuleContent | Should -Match '\. "\$PSScriptRoot/Classes/TmuxSessionReference\.ps1"'
     }
     
-    It "Should have SessionId property available" -Pending {
+    It "Should have SessionId property available" {
         Import-Module $ModulePath -Force
         $SessionRef = [TmuxSessionReference]::new(@{SessionId='test-props'})
         $SessionRef.PSObject.Properties.Name | Should -Contain "SessionId"

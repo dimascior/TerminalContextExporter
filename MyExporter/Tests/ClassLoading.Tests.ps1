@@ -33,7 +33,7 @@ Describe "Class Loading Regression Test" {
     
     Context "TmuxSessionReference Class" {
         
-        It "Should load TmuxSessionReference class when module is imported" -Pending {
+        It "Should load TmuxSessionReference class when module is imported" {
             { [TmuxSessionReference] } | Should -Not -Throw
         }
     }

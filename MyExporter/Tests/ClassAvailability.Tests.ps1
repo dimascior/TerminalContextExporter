@@ -11,7 +11,7 @@ InModuleScope MyExporter {
             $sysInfo.GetType().Name | Should -Be 'SystemInfo'
         }
         
-        It 'TmuxSessionReference should be loadable' -Pending {
+        It 'TmuxSessionReference should be loadable' {
             $sessionRef = [TmuxSessionReference]::new(@{SessionId='test'})
             $sessionRef | Should -Not -BeNullOrEmpty
             $sessionRef.GetType().Name | Should -Be 'TmuxSessionReference'
