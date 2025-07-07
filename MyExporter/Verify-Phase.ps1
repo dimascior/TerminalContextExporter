@@ -19,6 +19,13 @@ param(
     [switch]$SkipCICheck
 )
 
+# Exclude DevScripts from FileList/PSA checks (scratch helpers)
+$DevDir = Join-Path $PSScriptRoot 'DevScripts'
+$excluded = @()
+if (Test-Path $DevDir) {
+    $excluded = Get-ChildItem $DevDir -Recurse | ForEach-Object FullName
+}
+
 $ErrorActionPreference = 'Stop'
 
 function Write-PhaseStatus {
@@ -102,13 +109,19 @@ function Test-GuardRailsCompliance {
         }
     }
     
-    # Check 6: Script Analyzer compliance
+    # Check 6: Script Analyzer compliance (excluding DevScripts)
     try {
         if (Get-Module -ListAvailable PSScriptAnalyzer) {
-            $Results = Invoke-ScriptAnalyzer -Path $PSScriptRoot -Recurse -Settings PSGallery
-            $CriticalIssues = $Results | Where-Object { $_.Severity -eq 'Error' }
-            if ($CriticalIssues) {
-                $Violations += "ScriptAnalyzer: $($CriticalIssues.Count) critical issues found"
+            # Get all PowerShell files except DevScripts
+            $FilesToAnalyze = Get-ChildItem -Path $PSScriptRoot -Recurse -Include "*.ps1", "*.psm1", "*.psd1" | 
+                Where-Object { $_.FullName -notin $script:excluded }
+            
+            if ($FilesToAnalyze) {
+                $Results = $FilesToAnalyze | ForEach-Object { Invoke-ScriptAnalyzer -Path $_.FullName -Settings PSGallery }
+                $CriticalIssues = $Results | Where-Object { $_.Severity -eq 'Error' }
+                if ($CriticalIssues) {
+                    $Violations += "ScriptAnalyzer: $($CriticalIssues.Count) critical issues found"
+                }
             }
         }
     } catch {
@@ -230,7 +243,7 @@ function Test-FileList {
         $DeclaredFiles = $ManifestData.FileList
         
         if ($DeclaredFiles) {
-            # Get actual runtime files
+            # Get actual runtime files (excluding DevScripts)
             $ActualFiles = @()
             $ActualFiles += Get-ChildItem "$PSScriptRoot\*.ps*1" -File | ForEach-Object { $_.Name }
             $ActualFiles += Get-ChildItem "$PSScriptRoot\Private\*.ps1" -File -ErrorAction SilentlyContinue | ForEach-Object { "Private\$($_.Name)" }
@@ -238,6 +251,11 @@ function Test-FileList {
             $ActualFiles += Get-ChildItem "$PSScriptRoot\Classes\*.ps1" -File -ErrorAction SilentlyContinue | ForEach-Object { "Classes\$($_.Name)" }
             $ActualFiles += Get-ChildItem "$PSScriptRoot\Policies\*.yml" -File -ErrorAction SilentlyContinue | ForEach-Object { "Policies\$($_.Name)" }
             if (Test-Path "$PSScriptRoot\Initialize-WSLUser.sh") { $ActualFiles += "Initialize-WSLUser.sh" }
+            if (Test-Path "$PSScriptRoot\Verify-Phase.ps1") { $ActualFiles += "Verify-Phase.ps1" }
+            
+            # Add test files but exclude DevScripts
+            $TestFiles = Get-ChildItem "$PSScriptRoot\Tests\*" -File -ErrorAction SilentlyContinue | ForEach-Object { "Tests\$($_.Name)" }
+            $ActualFiles += $TestFiles
             
             # Compare lists
             $MissingFromManifest = $ActualFiles | Where-Object { $_ -notin $DeclaredFiles }

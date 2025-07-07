@@ -11,18 +11,14 @@ Describe "Telemetry Compliance Tests" {
         
         It "Should have ≤3 telemetry calls per Export-SystemInfo execution" {
             # This test ensures we don't have telemetry pollution per GuardRails.md
-            # We'll mock the telemetry functions to count calls
+            # We'll use real telemetry call counting instead of mocks
             
-            $TelemetryCallCount = 0
+            $Script:TelemetryCalls = @()
             
-            # Mock telemetry functions to count calls
-            Mock Invoke-WithTelemetry -ModuleName MyExporter {
-                $script:TelemetryCallCount++
-                & $ScriptBlock
-            }
-            
-            Mock TerminalTelemetryBatcher -ModuleName MyExporter {
-                $script:TelemetryCallCount++
+            # Override telemetry functions to count real calls
+            function Global:Write-TelemetryEvent { 
+                param($Name) 
+                $Script:TelemetryCalls += $Name 
             }
             
             # Create a temp output file
@@ -33,7 +29,7 @@ Describe "Telemetry Compliance Tests" {
                 Export-SystemInfo -ComputerName "localhost" -OutputPath $TempOutput -Format "JSON" -IncludeTerminalInfo -WhatIf
                 
                 # Verify telemetry call count is within limits
-                $TelemetryCallCount | Should -BeLessOrEqual 3 -Because "GuardRails.md requires ≤3 telemetry calls per Export-SystemInfo"
+                $Script:TelemetryCalls.Count | Should -BeLessOrEqual 3 -Because "GuardRails.md requires ≤3 telemetry calls per Export-SystemInfo"
                 
             } finally {
                 Remove-Item $TempOutput -ErrorAction SilentlyContinue

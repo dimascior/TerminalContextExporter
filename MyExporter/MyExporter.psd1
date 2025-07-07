@@ -22,6 +22,7 @@
 
     # FileList - Complete enumeration of all shipping files
     FileList = @(
+        'MyExporter.psd1',
         'MyExporter.psm1',
         'Classes/SystemInfo.ps1',
         'Classes/TmuxSessionReference.ps1',
@@ -66,7 +67,7 @@
     PrivateData = @{
         PSData = @{
             Tags = @('Exporter', 'SystemInfo', 'CrossPlatform', 'ContextAware', 'AI')
-            Prerelease = 'alpha.6'
+            Prerelease = 'alpha.7'
         }
     }
 }
