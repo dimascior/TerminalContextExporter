@@ -1,6 +1,6 @@
 # MyExporter/MyExporter.psm1
 
-# PRINCIPLE: Acknowledge the JIT compiler. Enforce strictness for the entire module scope.
+# ----- MODULE BOOTSTRAP -----
 Set-StrictMode -Version Latest
 
 # STEP 1: Load all class files FIRST, immediately after Set-StrictMode

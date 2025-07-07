@@ -2,16 +2,19 @@
 # Initialize-WSLUser.sh - TasksV4 Phase 2.3
 # Created: July 6, 2025
 # Framework: GuardRails.md Part 11.5 - Virtual Environment
-# Purpose: Sandboxed user creation for secure terminal operations
+# Purpose: Sandboxed user creation for secure terminal operations (IDEMPOTENT)
 
 set -euo pipefail  # Exit on error, undefined vars, pipe failures
 
 # Configuration
-MYEXPORTER_USER="myexporter"
+MYEXPORTER_USER="${WSL_USER:-myexporter}"
 MYEXPORTER_GROUP="myexporter"
 MYEXPORTER_HOME="/home/${MYEXPORTER_USER}"
 MYEXPORTER_SHELL="/bin/bash"
 LOG_FILE="/tmp/myexporter-init.log"
+
+# Idempotency helpers
+command -v sudo >/dev/null || sudo() { "$@"; }
 
 # Logging function
 log() {
@@ -24,18 +27,18 @@ error_exit() {
     exit 1
 }
 
-# Check if running as root or with sudo
+# Check if running as root or with sudo (allow idempotent runs)
 check_privileges() {
-    if [[ $EUID -ne 0 ]]; then
-        error_exit "This script must be run as root or with sudo"
+    if [[ $EUID -ne 0 ]] && ! command -v sudo >/dev/null; then
+        error_exit "This script must be run as root or with sudo available"
     fi
-    log "Privilege check passed: running as root"
+    log "Privilege check passed"
 }
 
-# Check if user already exists
+# Check if user already exists (idempotent)
 check_existing_user() {
-    if id "$MYEXPORTER_USER" &>/dev/null; then
-        log "User $MYEXPORTER_USER already exists"
+    if getent passwd "$MYEXPORTER_USER" >/dev/null 2>&1; then
+        log "User $MYEXPORTER_USER already exists - verifying configuration"
         
         # Verify user configuration
         USER_HOME=$(getent passwd "$MYEXPORTER_USER" | cut -d: -f6)
@@ -68,21 +71,29 @@ create_group() {
     log "Group $MYEXPORTER_GROUP created successfully"
 }
 
-# Create MyExporter user
+# Create MyExporter user (idempotent)
 create_user() {
     log "Creating user: $MYEXPORTER_USER"
     
-    # Create user with specific parameters for security
-    useradd \
-        --user-group \
-        --create-home \
-        --home-dir "$MYEXPORTER_HOME" \
-        --shell "$MYEXPORTER_SHELL" \
-        --comment "MyExporter Terminal Integration User" \
-        --groups "$MYEXPORTER_GROUP" \
-        "$MYEXPORTER_USER" || error_exit "Failed to create user $MYEXPORTER_USER"
-    
-    log "User $MYEXPORTER_USER created successfully"
+    # Create user with specific parameters for security (idempotent)
+    if ! getent passwd "$MYEXPORTER_USER" >/dev/null 2>&1; then
+        sudo useradd \
+            --user-group \
+            --create-home \
+            --home-dir "$MYEXPORTER_HOME" \
+            --shell "$MYEXPORTER_SHELL" \
+            --comment "MyExporter Terminal Integration User" \
+            --groups "$MYEXPORTER_GROUP" \
+            "$MYEXPORTER_USER" 2>/dev/null || true
+        
+        if getent passwd "$MYEXPORTER_USER" >/dev/null 2>&1; then
+            log "User $MYEXPORTER_USER created successfully"
+        else
+            error_exit "Failed to create user $MYEXPORTER_USER"
+        fi
+    else
+        log "User $MYEXPORTER_USER already exists - skipping creation"
+    fi
 }
 
 # Set up user environment

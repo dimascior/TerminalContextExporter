@@ -7,8 +7,10 @@ function Export-SystemInfo {
     param(
         [Parameter(Mandatory, ValueFromPipeline)] [string[]]$ComputerName,
         [Parameter(Mandatory)] [string]$OutputPath,
+        [Parameter(Mandatory)] [ValidateSet('JSON', 'CSV', 'XML')] [string]$Format,
         [switch]$UseSSH,
-        [switch]$AsJson
+        [switch]$AsJson,
+        [switch]$IncludeTerminalInfo
     )
 
     begin {

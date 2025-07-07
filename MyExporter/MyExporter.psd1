@@ -26,13 +26,28 @@
         'Classes/SystemInfo.ps1',
         'Classes/TmuxSessionReference.ps1',
         'Private/_Initialize.ps1',
+        'Private/Add-TerminalContextToSystemInfo.ps1',
         'Private/Assert-ContextPath.ps1',
+        'Private/Assert-ContextualPath.ps1',
+        'Private/Get-CurrentSession.ps1',
         'Private/Get-ExecutionContext.ps1',
         'Private/Get-SystemInfo.Windows.ps1',
         'Private/Get-SystemInfo.Linux.ps1', 
         'Private/Get-SystemInfoPlatformSpecific.ps1',
+        'Private/Get-TerminalContext.WSL.ps1',
+        'Private/Get-TerminalContextPlatformSpecific.ps1',
+        'Private/Get-TerminalOutput.WSL.ps1',
         'Private/Invoke-WithTelemetry.ps1',
-        'Public/Export-SystemInfo.ps1'
+        'Private/Invoke-WslTmuxCommand.ps1',
+        'Private/New-TmuxArgumentList.ps1',
+        'Private/TerminalTelemetryBatcher.ps1',
+        'Private/Test-CommandSafety.ps1',
+        'Private/Test-TerminalCapabilities.ps1',
+        'Private/Update-StateFileSchema.ps1',
+        'Public/Export-SystemInfo.ps1',
+        'Policies/terminal.deny.yml',
+        'Initialize-WSLUser.sh',
+        'Verify-Phase.ps1'
     )
 
     # --- Module Metadata ---
@@ -45,7 +60,7 @@
     PrivateData = @{
         PSData = @{
             Tags = @('Exporter', 'SystemInfo', 'CrossPlatform', 'ContextAware', 'AI')
-            Prerelease = 'alpha.4'
+            Prerelease = 'alpha.5'
         }
     }
 }

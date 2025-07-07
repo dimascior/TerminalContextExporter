@@ -3,21 +3,8 @@
 *.psc1
 *.vscode/
 
-# Test output files
-test-output*.csv
-test-output*.json
-final-test*.csv
-final-test*.json
-test-phase*.json
-test-tmux*.json
-
-# Development test scripts (not formal Pester tests)
-Test-Phase*.ps1
-Test-ClassLoading.ps1
-Test-ModuleLoading.ps1 
-Test-MyExporter.ps1
-Test-JobFunctionality.ps1
-Test-PowerShell51Compatibility.ps1
+# DevScripts - development and test helpers (not formal Pester tests)
+MyExporter/DevScripts/
 test-params.ps1
 test_claude_analysis.ps1
 claude-*-test.sh

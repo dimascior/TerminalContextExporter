@@ -16,12 +16,10 @@
 
 [CmdletBinding()]
 param(
-    [switch]$SkipCICheck,
-    [switch]$Verbose
+    [switch]$SkipCICheck
 )
 
 $ErrorActionPreference = 'Stop'
-$VerbosePreference = if ($Verbose) { 'Continue' } else { 'SilentlyContinue' }
 
 function Write-PhaseStatus {
     param([string]$Message, [string]$Status = 'INFO')
@@ -51,24 +49,60 @@ function Test-GuardRailsCompliance {
     
     # Check 2: CommandSanitizer should use external policy file
     $CommandSanitizerPath = "$PSScriptRoot\Private\Test-CommandSafety.ps1"
-    $PolicyPath = "$PSScriptRoot\Policies\terminal-deny.yaml"
+    $PolicyPath = "$PSScriptRoot\Policies\terminal.deny.yml"
     if (Test-Path $CommandSanitizerPath) {
         $Content = Get-Content $CommandSanitizerPath -Raw
-        if ($Content -match '\$DenyList\s*=\s*@\(' -and !(Test-Path $PolicyPath)) {
+        if ($Content -match '\$DenyList\s*=\s*@\(' -and (-not (Test-Path $PolicyPath))) {
             $Violations += "CommandSanitizer: Hardcoded deny list should be moved to $PolicyPath"
         }
     }
     
-    # Check 3: TmuxSessionReference class autoloading
+    # Check 3: Classes should be loaded via ScriptsToProcess or dot-sourcing
     $ModulePath = "$PSScriptRoot\MyExporter.psm1"
-    if (Test-Path $ModulePath) {
-        $Content = Get-Content $ModulePath -Raw
-        if (!(($Content -match 'using module.*TmuxSessionReference') -or ($Content -match 'Import-Module.*TmuxSessionReference'))) {
-            $Violations += "MyExporter.psm1: Missing TmuxSessionReference class autoloading"
+    $ManifestPath = "$PSScriptRoot\MyExporter.psd1" 
+    if ((Test-Path $ModulePath) -and (Test-Path $ManifestPath)) {
+        $ModuleContent = Get-Content $ModulePath -Raw
+        $ManifestContent = Get-Content $ManifestPath -Raw
+        
+        # Check if classes are loaded via ScriptsToProcess (preferred for PowerShell 5.1)
+        $hasScriptsToProcess = $ManifestContent -match "ScriptsToProcess.*SystemInfo\.ps1.*TmuxSessionReference\.ps1"
+        
+        # Check if classes are dot-sourced in module (fallback method)  
+        $hasDotSourced = ($ModuleContent -match '\. "\$PSScriptRoot/Classes/SystemInfo\.ps1"') -and 
+                        ($ModuleContent -match '\. "\$PSScriptRoot/Classes/TmuxSessionReference\.ps1"')
+        
+        if ((-not $hasScriptsToProcess) -and (-not $hasDotSourced)) {
+            $Violations += "Classes must be loaded via ScriptsToProcess in manifest or dot-sourced in module"
         }
     }
     
-    # Check 4: Script Analyzer compliance
+    # Check 4: DevScripts should not contain runtime files
+    $DevScriptsPath = "$PSScriptRoot\DevScripts"
+    if (Test-Path $DevScriptsPath) {
+        $DevFiles = Get-ChildItem $DevScriptsPath -Recurse -Include "*.ps1","*.psm1","*.psd1"
+        # Exclude legitimate dev/test files that should be in DevScripts
+        $RuntimeFiles = $DevFiles | Where-Object { 
+            ($_.Name -match '^(Export-|Get-|Invoke-|New-|Set-|Add-|Update-)') -and 
+            ($_.Name -notmatch '^Test-') -and 
+            ($_.Name -notmatch '^test-')
+        }
+        if ($RuntimeFiles) {
+            $Violations += "DevScripts contains runtime files: $($RuntimeFiles.Name -join ', ') (should be in Private/ or Public/)"
+        }
+    }
+    
+    # Check 5: Telemetry wrappers should not be nested
+    $PublicFunctions = Get-ChildItem "$PSScriptRoot\Public\*.ps1" -ErrorAction SilentlyContinue
+    foreach ($FunctionFile in $PublicFunctions) {
+        $Content = Get-Content $FunctionFile.FullName -Raw
+        # Count telemetry calls - should be ≤ 1 per public function
+        $TelemetryMatches = [regex]::Matches($Content, 'Invoke-WithTelemetry|Write-TelemetryEvent')
+        if ($TelemetryMatches.Count -gt 1) {
+            $Violations += "$($FunctionFile.Name): Contains $($TelemetryMatches.Count) telemetry calls (should be ≤ 1)"
+        }
+    }
+    
+    # Check 6: Script Analyzer compliance
     try {
         if (Get-Module -ListAvailable PSScriptAnalyzer) {
             $Results = Invoke-ScriptAnalyzer -Path $PSScriptRoot -Recurse -Settings PSGallery
@@ -105,7 +139,7 @@ function Test-TestCoverage {
     # Check that no tests are simulated/sentinel-based
     foreach ($TestFile in $TestFiles) {
         $Content = Get-Content $TestFile.FullName -Raw
-        if ($Content -match 'Mock|Sentinel|Simulate' -and $Content -notmatch '# Real test') {
+        if (($Content -match 'Mock|Sentinel|Simulate') -and ($Content -notmatch '# Real test')) {
             $Issues += "$($TestFile.Name): Contains simulated/mock tests (should be real)"
         }
     }
@@ -121,6 +155,8 @@ function Test-ApiContract {
     
     # Load current module and check API contract
     try {
+        # Force clean import to test real module loading behavior
+        Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
         Import-Module "$PSScriptRoot\MyExporter.psd1" -Force
         $ExportedCommands = (Get-Module MyExporter).ExportedCommands.Keys
         
@@ -136,6 +172,35 @@ function Test-ApiContract {
         } else {
             $Issues += "Export-SystemInfo command not exported"
         }
+        
+        # Verify class scope integrity (no child scopes spawned)
+        $ModuleCommands = Get-Command MyExporter* -Module MyExporter -ErrorAction SilentlyContinue
+        foreach ($Cmd in $ModuleCommands) {
+            if ($Cmd.Module.ScopeName -ne 'MyExporter') {
+                $Issues += "Command $($Cmd.Name) in wrong scope: $($Cmd.Module.ScopeName) (should be MyExporter)"
+            }
+        }
+        
+        # Verify classes are available in module scope
+        try {
+            # Test class availability differently in PowerShell 5.1 vs 7+
+            if ($PSVersionTable.PSVersion.Major -eq 5) {
+                # In PowerShell 5.1, classes may not be visible via [ClassName] syntax
+                # but can be instantiated if properly loaded
+                $testData = @{SessionId='test'; SessionName='test'; CorrelationId='test'}
+                $null = New-Object -TypeName TmuxSessionReference -ArgumentList $testData
+                $null = New-Object -TypeName SystemInfo -ArgumentList @{ComputerName='test'}
+                Write-Verbose "Classes validated via New-Object in PowerShell 5.1"
+            } else {
+                # PowerShell 7+ can use direct type syntax
+                $null = [TmuxSessionReference]
+                $null = [SystemInfo]
+                Write-Verbose "Classes validated via type syntax in PowerShell 7+"
+            }
+        } catch {
+            $Issues += "Classes not available in module scope: $_"
+        }
+        
     } catch {
         $Issues += "Failed to import module: $_"
     }
