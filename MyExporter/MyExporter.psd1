@@ -20,6 +20,12 @@
     # RULE: These are the only external modules this project depends on.
     RequiredModules = @()
 
+    # RULE: Classes must be loaded before the module for PowerShell 5.1 compatibility
+    ScriptsToProcess = @(
+        'Classes/SystemInfo.ps1',
+        'Classes/TmuxSessionReference.ps1'
+    )
+
     # FileList - Complete enumeration of all shipping files
     FileList = @(
         'MyExporter.psm1',

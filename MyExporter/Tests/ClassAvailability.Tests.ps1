@@ -1,9 +1,8 @@
-InModuleScope MyExporter {
-    Describe 'Class availability' {
-        BeforeEach {
-            Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
-            Import-Module "$PSScriptRoot\..\MyExporter.psd1" -Force
-        }
+Describe 'Class availability' {
+    BeforeAll {
+        Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
+        Import-Module "$PSScriptRoot\..\MyExporter.psd1" -Force
+    }
         
         It 'SystemInfo should be loadable' {
             $sysInfo = [SystemInfo]::new(@{ComputerName='test'})
@@ -26,5 +25,4 @@ InModuleScope MyExporter {
             $cmd = Get-Command Export-SystemInfo
             $cmd.OutputType | Should -Not -BeNullOrEmpty
         }
-    }
 }

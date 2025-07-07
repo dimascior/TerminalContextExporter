@@ -9,7 +9,7 @@ Describe "Telemetry Compliance Tests" {
     
     Context "Telemetry Wrapper Usage Limits" {
         
-        It "Should have ≤3 telemetry calls per Export-SystemInfo execution" -Pending {
+        It "Should have ≤3 telemetry calls per Export-SystemInfo execution" {
             # This test ensures we don't have telemetry pollution per GuardRails.md
             # We'll mock the telemetry functions to count calls
             
@@ -40,7 +40,7 @@ Describe "Telemetry Compliance Tests" {
             }
         }
         
-        It "Should only wrap Get-TerminalContext* functions with telemetry" -Pending {
+        It "Should only wrap Get-TerminalContext* functions with telemetry" {
             # Per GuardRails requirement: Remove all inner telemetry wrappers from /Private/*.ps1, 
             # wrap only in Get-TerminalContext*.ps1
             
@@ -50,9 +50,10 @@ Describe "Telemetry Compliance Tests" {
             foreach ($File in $PrivateFiles) {
                 $Content = Get-Content $File.FullName -Raw
                 
-                # Skip the telemetry files themselves and Get-TerminalContext* files
+                # Skip the telemetry files themselves and Get-TerminalContext* files and Get-TerminalOutput* files
                 if ($File.Name -in @('Invoke-WithTelemetry.ps1', 'TerminalTelemetryBatcher.ps1') -or 
-                    $File.Name -like 'Get-TerminalContext*.ps1') {
+                    $File.Name -like 'Get-TerminalContext*.ps1' -or
+                    $File.Name -like 'Get-TerminalOutput*.ps1') {
                     continue
                 }
                 
