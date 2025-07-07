@@ -262,23 +262,24 @@ function Test-ChangelogRequirement {
     $Issues = @()
     
     # Check for CHANGELOG.md existence
-    $ChangelogPath = Split-Path $PSScriptRoot -Parent | Join-Path -ChildPath "CHANGELOG.md"
+    $ChangelogPath = Join-Path (Split-Path $PSScriptRoot -Parent) "CHANGELOG.md"
     if (-not (Test-Path $ChangelogPath)) {
-        $Issues += "CHANGELOG.md is required per GuardRails.md but not found"
+        $Issues += "CHANGELOG.md not found - required for public API or file-set changes"
+        return $Issues
+    }
+    
+    # Check CHANGELOG has recent entry (within 7 days)
+    $ChangelogContent = Get-Content $ChangelogPath -Raw
+    $DatePattern = '\d{4}-\d{2}-\d{2}'
+    $DateMatches = [regex]::Matches($ChangelogContent, $DatePattern)
+    
+    if ($DateMatches.Count -eq 0) {
+        $Issues += "CHANGELOG.md has no dated entries"
     } else {
-        # Check if CHANGELOG has been updated for public API or file set changes
-        $RecentCommits = git log --oneline -n 5 2>$null
-        if ($RecentCommits) {
-            $HasPublicChanges = $RecentCommits | Where-Object { 
-                $_ -match '\b(Public|API|parameter|function|class|interface)\b' 
-            }
-            if ($HasPublicChanges) {
-                $ChangelogContent = Get-Content $ChangelogPath -Raw
-                $Today = Get-Date -Format "yyyy-MM-dd"
-                if ($ChangelogContent -notmatch "\[$Today\]|\[Unreleased\]") {
-                    $Issues += "Recent public API changes detected but CHANGELOG.md not updated"
-                }
-            }
+        $LatestDate = ($DateMatches | ForEach-Object { [DateTime]::Parse($_.Value) } | Sort-Object -Descending)[0]
+        $DaysSinceUpdate = (Get-Date) - $LatestDate
+        if ($DaysSinceUpdate.Days -gt 7) {
+            $Issues += "CHANGELOG.md last updated $([math]::Round($DaysSinceUpdate.Days)) days ago - may need recent entry"
         }
     }
     
@@ -295,8 +296,9 @@ function Test-PendingSpecs {
     $TestFiles = Get-ChildItem "$PSScriptRoot\Tests\*.Tests.ps1" -ErrorAction SilentlyContinue
     foreach ($TestFile in $TestFiles) {
         $Content = Get-Content $TestFile.FullName -Raw
-        if ($Content -match '\[Pending\]') {
-            $Issues += "Test file $($TestFile.Name) contains [Pending] specifications - complete before phase completion"
+        $PendingMatches = [regex]::Matches($Content, '\s+-Pending\s*{')
+        if ($PendingMatches.Count -gt 0) {
+            $Issues += "$($TestFile.Name): Contains $($PendingMatches.Count) [Pending] test specs - must be resolved before completion"
         }
     }
     

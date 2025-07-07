@@ -14,10 +14,13 @@ MYEXPORTER_SHELL="/bin/bash"
 LOG_FILE="/tmp/myexporter-init.log"
 
 # Idempotency helpers - ensure commands work with or without sudo
-if ! command -v sudo >/dev/null; then
-    # In containers or environments without sudo, provide a pass-through
-    sudo() { "$@"; }
-fi
+command -v sudo >/dev/null || sudo() { "$@"; }
+
+# Create user idempotently  
+create_user_idempotent() {
+    getent passwd "$MYEXPORTER_USER" >/dev/null || 
+        sudo useradd -m -s /bin/bash "$MYEXPORTER_USER"
+}
 
 # Logging function
 log() {

@@ -20,12 +20,6 @@
     # RULE: These are the only external modules this project depends on.
     RequiredModules = @()
 
-    # RULE: Classes must be loaded before the module for PowerShell 5.1 compatibility
-    ScriptsToProcess = @(
-        'Classes/SystemInfo.ps1',
-        'Classes/TmuxSessionReference.ps1'
-    )
-
     # FileList - Complete enumeration of all shipping files
     FileList = @(
         'MyExporter.psm1',
@@ -53,7 +47,13 @@
         'Public/Export-SystemInfo.ps1',
         'Policies/terminal.deny.yml',
         'Initialize-WSLUser.sh',
-        'Verify-Phase.ps1'
+        'Verify-Phase.ps1',
+        'Tests/ClassAvailability.Tests.ps1',
+        'Tests/ClassLoading.Tests.ps1',
+        'Tests/Export-SystemInfo.Tests.ps1',
+        'Tests/TelemetryCompliance.Tests.ps1',
+        'Tests/TmuxSessionReference.Tests.ps1',
+        'Tests/Initialize-WSLUser.bats'
     )
 
     # --- Module Metadata ---
@@ -66,7 +66,7 @@
     PrivateData = @{
         PSData = @{
             Tags = @('Exporter', 'SystemInfo', 'CrossPlatform', 'ContextAware', 'AI')
-            Prerelease = 'alpha.5'
+            Prerelease = 'alpha.6'
         }
     }
 }
