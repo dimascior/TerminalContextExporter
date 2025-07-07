@@ -1,0 +1,57 @@
+﻿{
+    "CommitSHA":  "602efba",
+    "CorrelationId":  "6e46d36a-6de3-4995-b289-541159fb0daa",
+    "Timestamp":  {
+                      "value":  "\/Date(1751858759373)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Sunday, July 6, 2025 11:25:59 PM"
+                  },
+    "Environment":  {
+                        "PSVersion":  "5.1.19041.5965",
+                        "OS":  "Unknown",
+                        "PSEdition":  "Desktop",
+                        "WorkingDirectory":  "C:\\Users\\dimas\\Desktop\\WorkflowDynamics\\MyExporter"
+                    },
+    "Tests":  [
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858759761)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:25:59 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "19 parameters detected",
+                      "Name":  "Export-SystemInfo Parameter Count",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858759796)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:25:59 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "Class created: TEST",
+                      "Name":  "SystemInfo Class Instantiation",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858764626)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:26:04 PM"
+                                    },
+                      "Status":  "FAIL",
+                      "Evidence":  "Invalid JSON primitive: \"RunspaceId\",\"PSShowComputerName\",\"ComputerName\",\"Platform\",\"OS\",\"Version\",\"Source\",\"Timestamp\",\"CorrelationId\"\r\n\"localhost\",\"cd4eb7d1-32e7-4055-8c5b-14c5056f710b\",\"False\",\"localhost\",\"Unknown\",\"Unknown\",\"Unknown\",\"Direct\",\"7/6/2025 11:26:04 PM\",\"1916f14a-3094-4805-8573-401a18886979\"\r\n.",
+                      "Name":  "Export-SystemInfo Execution",
+                      "Details":  {
+
+                                  }
+                  }
+              ],
+    "TestSuite":  "TasksV5-Enhanced-Evidence"
+}

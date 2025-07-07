@@ -1,0 +1,273 @@
+name: PowerShell Cross-Platform Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Daily validation at 06:00 UTC
+    - cron: '0 6 * * *'
+
+env:
+  FORCE_COLOR: 1
+  TERM: xterm-256color
+
+jobs:
+  anti-simulation-gate:
+    name: "🚫 Block Simulated Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install PowerShell
+        shell: bash
+        run: |
+          wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install -y powershell
+      
+      - name: Run Anti-Simulation Gate
+        shell: pwsh
+        run: |
+          cd MyExporter
+          ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath "." -FailOnSimulated
+
+  powershell-matrix:
+    name: "PowerShell ${{ matrix.ps-version }} on ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    needs: anti-simulation-gate
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        ps-version: ['5.1', '7.4']
+        exclude:
+          # PowerShell 5.1 only available on Windows
+          - os: ubuntu-latest
+            ps-version: '5.1'
+          - os: macos-latest
+            ps-version: '5.1'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PowerShell ${{ matrix.ps-version }}
+        if: matrix.ps-version == '7.4'
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+            sudo dpkg -i packages-microsoft-prod.deb
+            sudo apt-get update
+            sudo apt-get install -y powershell
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install powershell
+          fi
+      
+      - name: Install WSL (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: powershell
+        run: |
+          Write-Host "Installing WSL..."
+          wsl --install --no-distribution
+          # Install Ubuntu for testing
+          wsl --install Ubuntu-20.04 --web-download
+          
+      - name: Setup tmux (Ubuntu/macOS)
+        if: matrix.os != 'windows-latest'
+        shell: bash
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y tmux
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install tmux
+          fi
+          
+      - name: Validate Module Structure
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Test module loading
+          Write-Host "Testing module import..."
+          Import-Module ./MyExporter.psd1 -Force
+          
+          # Verify module functions
+          $functions = Get-Command -Module MyExporter
+          Write-Host "Exported functions: $($functions.Count)"
+          
+          if ($functions.Count -eq 0) {
+            throw "No functions exported from module"
+          }
+
+      - name: Run Core Functionality Tests
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Fresh session test for Export-SystemInfo
+          ./DevScripts/Invoke-FreshSession.ps1 -ScriptPath "./DevScripts/Test-Phase1-Fixed.ps1" -Wait
+          
+      - name: Run WSL Integration Tests (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Test WSL availability
+          ./Test-TmuxAvailability.ps1
+          
+          # Test WSL-specific functionality
+          if (Get-Command wsl -ErrorAction SilentlyContinue) {
+            Write-Host "WSL available, running WSL tests..."
+            ./DevScripts/Test-Phase3-CrossBoundary.ps1
+          } else {
+            Write-Warning "WSL not available, skipping WSL tests"
+          }
+          
+      - name: Run tmux Integration Tests (Linux/macOS)
+        if: matrix.os != 'windows-latest'
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Test tmux availability and functionality
+          if (Get-Command tmux -ErrorAction SilentlyContinue) {
+            Write-Host "tmux available, running tmux tests..."
+            ./Test-TmuxAvailability.ps1
+          } else {
+            Write-Warning "tmux not available, skipping tmux tests"
+          }
+          
+      - name: Run GuardRails Compliance Check
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Verify GuardRails compliance
+          ./Verify-Phase.ps1 -Phase "all" -OutputPath "./compliance-${{ matrix.os }}-${{ matrix.ps-version }}.json"
+          
+      - name: Upload Test Evidence
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-evidence-${{ matrix.os }}-${{ matrix.ps-version }}
+          path: |
+            MyExporter/**/*.json
+            MyExporter/**/*.csv
+            MyExporter/**/*-results.json
+            MyExporter/StateFiles/
+          retention-days: 7
+
+  wsl-dedicated:
+    name: "🐧 WSL Deep Integration"
+    runs-on: windows-latest
+    needs: [anti-simulation-gate, powershell-matrix]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup WSL with Ubuntu
+        shell: powershell
+        run: |
+          # Enable WSL feature
+          wsl --install Ubuntu-20.04 --web-download
+          
+          # Wait for WSL to be ready
+          Start-Sleep -Seconds 30
+          
+          # Verify WSL installation
+          wsl --list --verbose
+          
+      - name: Configure WSL Environment
+        shell: powershell
+        run: |
+          # Install required packages in WSL
+          wsl -e bash -c "sudo apt-get update && sudo apt-get install -y tmux curl wget jq"
+          
+          # Verify tmux installation
+          wsl -e tmux -V
+          
+      - name: Run WSL-Specific Tests
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Test WSL boundary crossing
+          ./DevScripts/Test-Phase3-CrossBoundary.ps1
+          
+          # Test tmux session management from PowerShell->WSL
+          ./DevScripts/Test-Phase4-Platform.ps1
+          
+      - name: Validate Cross-Platform Data Exchange
+        shell: pwsh
+        run: |
+          cd MyExporter
+          
+          # Test data consistency across Windows/WSL boundary
+          ./DevScripts/Test-Phase5-Functionality.ps1
+
+  compliance-summary:
+    name: "📋 Compliance Summary"
+    runs-on: ubuntu-latest
+    needs: [powershell-matrix, wsl-dedicated]
+    if: always()
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download All Test Evidence
+        uses: actions/download-artifact@v4
+        with:
+          path: ./evidence
+          
+      - name: Generate Compliance Report
+        shell: pwsh
+        run: |
+          # Aggregate all test evidence
+          $evidenceFiles = Get-ChildItem -Path "./evidence" -Recurse -Include "*.json" | Where-Object { $_.Name -match "compliance|results" }
+          
+          $report = @{
+            Timestamp = Get-Date -Format 'o'
+            CommitSHA = '${{ github.sha }}'
+            Ref = '${{ github.ref }}'
+            MatrixResults = @()
+            ComplianceStatus = "Unknown"
+            TotalTests = 0
+            PassedTests = 0
+            FailedTests = 0
+          }
+          
+          foreach ($file in $evidenceFiles) {
+            try {
+              $content = Get-Content -Path $file.FullName -Raw | ConvertFrom-Json
+              $report.MatrixResults += $content
+              
+              if ($content.TotalTests) { $report.TotalTests += $content.TotalTests }
+              if ($content.PassedTests) { $report.PassedTests += $content.PassedTests }
+              if ($content.FailedTests) { $report.FailedTests += $content.FailedTests }
+            } catch {
+              Write-Warning "Failed to parse $($file.FullName): $_"
+            }
+          }
+          
+          $report.ComplianceStatus = if ($report.FailedTests -eq 0 -and $report.TotalTests -gt 0) { "PASS" } else { "FAIL" }
+          
+          Write-Host "=== COMPLIANCE SUMMARY ===" -ForegroundColor Yellow
+          Write-Host "Status: $($report.ComplianceStatus)" -ForegroundColor $(if($report.ComplianceStatus -eq "PASS"){"Green"}else{"Red"})
+          Write-Host "Total Tests: $($report.TotalTests)" -ForegroundColor Cyan
+          Write-Host "Passed: $($report.PassedTests)" -ForegroundColor Green
+          Write-Host "Failed: $($report.FailedTests)" -ForegroundColor Red
+          
+          # Save final report
+          $report | ConvertTo-Json -Depth 5 | Set-Content -Path "./compliance-final.json"
+          
+      - name: Upload Final Compliance Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-final-report
+          path: ./compliance-final.json
+          retention-days: 30

@@ -1,0 +1,57 @@
+﻿{
+    "CommitSHA":  "602efba",
+    "CorrelationId":  "87d69318-c377-4cab-b934-1961a64b0291",
+    "Timestamp":  {
+                      "value":  "\/Date(1751858810607)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Sunday, July 6, 2025 11:26:50 PM"
+                  },
+    "Environment":  {
+                        "PSVersion":  "5.1.19041.5965",
+                        "OS":  "Unknown",
+                        "PSEdition":  "Desktop",
+                        "WorkingDirectory":  "C:\\Users\\dimas\\Desktop\\WorkflowDynamics\\MyExporter"
+                    },
+    "Tests":  [
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858810711)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:26:50 PM"
+                                    },
+                      "Status":  "FAIL",
+                      "Evidence":  "A parameter cannot be found that matches parameter name \u0027WhatIf\u0027.",
+                      "Name":  "Verify-Phase Execution",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858810802)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:26:50 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "37 files listed, all present",
+                      "Name":  "FileList Accuracy",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858810804)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:26:50 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "CHANGELOG.md found",
+                      "Name":  "CHANGELOG Requirement",
+                      "Details":  {
+
+                                  }
+                  }
+              ],
+    "TestSuite":  "TasksV5-Enhanced-Evidence"
+}

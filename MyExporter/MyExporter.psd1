@@ -20,6 +20,12 @@
     # RULE: These are the only external modules this project depends on.
     RequiredModules = @()
 
+    # ScriptsToProcess - Classes must be loaded via this mechanism to be available in caller scope (PS 5.1 requirement)
+    ScriptsToProcess = @(
+        'Classes/SystemInfo.ps1',
+        'Classes/TmuxSessionReference.ps1'
+    )
+
     # FileList - Complete enumeration of all shipping files
     FileList = @(
         'Classes/SystemInfo.ps1',
@@ -56,7 +62,9 @@
         'Tests/TelemetryCompliance.Tests.ps1',
         'Tests/Test-TmuxArgumentList.ps1',
         'Tests/TmuxSessionReference.Tests.ps1',
-        'Verify-Phase.ps1'
+        'Test-TmuxAvailability.ps1',
+        'Verify-Phase.ps1',
+        'enhanced-test-bridge.ps1'
     )
 
     # --- Module Metadata ---

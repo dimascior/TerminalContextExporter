@@ -1,0 +1,57 @@
+﻿{
+    "CommitSHA":  "602efba",
+    "CorrelationId":  "de7daaff-00a1-4a0a-8e98-c188c5b3372d",
+    "Timestamp":  {
+                      "value":  "\/Date(1751858383296)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Sunday, July 6, 2025 11:19:43 PM"
+                  },
+    "Environment":  {
+                        "PSVersion":  "5.1.19041.5965",
+                        "OS":  "Unknown",
+                        "PSEdition":  "Desktop",
+                        "WorkingDirectory":  "C:\\Users\\dimas\\Desktop\\WorkflowDynamics\\MyExporter"
+                    },
+    "Tests":  [
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858383543)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:19:43 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "19 parameters detected",
+                      "Name":  "Export-SystemInfo Parameter Count",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858383577)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:19:43 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "Class created: TEST",
+                      "Name":  "SystemInfo Class Instantiation",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858478119)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:21:18 PM"
+                                    },
+                      "Status":  "FAIL",
+                      "Evidence":  "Cannot bind argument to parameter \u0027OutputPath\u0027 because it is an empty string.",
+                      "Name":  "Export-SystemInfo Execution",
+                      "Details":  {
+
+                                  }
+                  }
+              ],
+    "TestSuite":  "TasksV5-Enhanced-Evidence"
+}

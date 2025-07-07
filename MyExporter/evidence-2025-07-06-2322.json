@@ -1,0 +1,57 @@
+﻿{
+    "CommitSHA":  "602efba",
+    "CorrelationId":  "892254bb-0c2a-45d2-be64-84f9fe8bd213",
+    "Timestamp":  {
+                      "value":  "\/Date(1751858533856)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Sunday, July 6, 2025 11:22:13 PM"
+                  },
+    "Environment":  {
+                        "PSVersion":  "5.1.19041.5965",
+                        "OS":  "Unknown",
+                        "PSEdition":  "Desktop",
+                        "WorkingDirectory":  "C:\\Users\\dimas\\Desktop\\WorkflowDynamics\\MyExporter"
+                    },
+    "Tests":  [
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858534109)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:22:14 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "19 parameters detected",
+                      "Name":  "Export-SystemInfo Parameter Count",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858534142)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:22:14 PM"
+                                    },
+                      "Status":  "PASS",
+                      "Evidence":  "Class created: TEST",
+                      "Name":  "SystemInfo Class Instantiation",
+                      "Details":  {
+
+                                  }
+                  },
+                  {
+                      "Timestamp":  {
+                                        "value":  "\/Date(1751858538809)\/",
+                                        "DisplayHint":  2,
+                                        "DateTime":  "Sunday, July 6, 2025 11:22:18 PM"
+                                    },
+                      "Status":  "FAIL",
+                      "Evidence":  "No output returned",
+                      "Name":  "Export-SystemInfo Execution",
+                      "Details":  {
+
+                                  }
+                  }
+              ],
+    "TestSuite":  "TasksV5-Enhanced-Evidence"
+}
