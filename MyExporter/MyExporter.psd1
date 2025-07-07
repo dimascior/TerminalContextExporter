@@ -20,26 +20,23 @@
     # RULE: These are the only external modules this project depends on.
     RequiredModules = @()
 
-    # Load class files via ScriptsToProcess for PowerShell 5.1 external visibility
-    ScriptsToProcess = @(
-        'Classes/SystemInfo.ps1',
-        'Classes/TmuxSessionReference.ps1'
-    )
-
     # FileList - Complete enumeration of all shipping files
     FileList = @(
-        'MyExporter.psd1',
-        'MyExporter.psm1',
         'Classes/SystemInfo.ps1',
         'Classes/TmuxSessionReference.ps1',
+        'Initialize-WSLUser.sh',
+        'MyExporter.psd1',
+        'MyExporter.psm1',
+        'Policies/terminal.deny.yml',
+        'Policies/terminal-deny.yaml',
         'Private/_Initialize.ps1',
         'Private/Add-TerminalContextToSystemInfo.ps1',
         'Private/Assert-ContextPath.ps1',
         'Private/Assert-ContextualPath.ps1',
         'Private/Get-CurrentSession.ps1',
         'Private/Get-ExecutionContext.ps1',
+        'Private/Get-SystemInfo.Linux.ps1',
         'Private/Get-SystemInfo.Windows.ps1',
-        'Private/Get-SystemInfo.Linux.ps1', 
         'Private/Get-SystemInfoPlatformSpecific.ps1',
         'Private/Get-TerminalContext.WSL.ps1',
         'Private/Get-TerminalContextPlatformSpecific.ps1',
@@ -52,15 +49,14 @@
         'Private/Test-TerminalCapabilities.ps1',
         'Private/Update-StateFileSchema.ps1',
         'Public/Export-SystemInfo.ps1',
-        'Policies/terminal.deny.yml',
-        'Initialize-WSLUser.sh',
-        'Verify-Phase.ps1',
         'Tests/ClassAvailability.Tests.ps1',
         'Tests/ClassLoading.Tests.ps1',
         'Tests/Export-SystemInfo.Tests.ps1',
+        'Tests/Initialize-WSLUser.bats',
         'Tests/TelemetryCompliance.Tests.ps1',
+        'Tests/Test-TmuxArgumentList.ps1',
         'Tests/TmuxSessionReference.Tests.ps1',
-        'Tests/Initialize-WSLUser.bats'
+        'Verify-Phase.ps1'
     )
 
     # --- Module Metadata ---
@@ -73,7 +69,7 @@
     PrivateData = @{
         PSData = @{
             Tags = @('Exporter', 'SystemInfo', 'CrossPlatform', 'ContextAware', 'AI')
-            Prerelease = 'alpha.7'
+            Prerelease = 'alpha.8'
         }
     }
 }

@@ -9,7 +9,7 @@ Describe "Telemetry Compliance Tests" {
     
     Context "Telemetry Wrapper Usage Limits" {
         
-        It "Should have ≤3 telemetry calls per Export-SystemInfo execution" -Pending {
+        It "Should have ≤3 telemetry calls per Export-SystemInfo execution" {
             # This test ensures we don't have telemetry pollution per GuardRails.md
             $script:TelemetryCalls = @()
             function Write-TelemetryEvent { param($Name) $script:TelemetryCalls += $Name }
