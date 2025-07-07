@@ -104,17 +104,23 @@ jobs:
         $ModulePath = "${{ github.workspace }}/MyExporter/MyExporter.psd1"
         Test-ModuleManifest -Path $ModulePath -ErrorAction Stop
     
-    - name: Run GuardRails Verification (PowerShell 5.1)
+    - name: GuardRails Verification Gate (PowerShell 5.1)
       if: matrix.psver == '5.1'
       shell: powershell
       run: |
         & "${{ github.workspace }}/MyExporter/Verify-Phase.ps1" -Verbose
+        if ($LASTEXITCODE -ne 0) {
+          throw "GuardRails verification failed"
+        }
     
-    - name: Run GuardRails Verification (PowerShell 7.x)
+    - name: GuardRails Verification Gate (PowerShell 7.x)
       if: matrix.psver != '5.1'
       shell: pwsh
       run: |
         & "${{ github.workspace }}/MyExporter/Verify-Phase.ps1" -Verbose
+        if ($LASTEXITCODE -ne 0) {
+          throw "GuardRails verification failed"
+        }
     
     - name: Import Module and Run ScriptAnalyzer (PowerShell 5.1)
       if: matrix.psver == '5.1'
@@ -191,6 +197,16 @@ jobs:
           Write-Host "Running WSL test: $Test"
           & "${{ github.workspace }}/MyExporter/DevScripts/$Test"
         }
+    
+    - name: Run WSL User Script Bats Tests (Ubuntu with WSL only)
+      if: matrix.os == 'ubuntu-latest' && matrix.use_wsl == true
+      shell: bash
+      run: |
+        # Install bats if not available
+        sudo apt-get install -y bats || true
+        # Run the WSL user script idempotency test
+        cd "${{ github.workspace }}/MyExporter/Tests"
+        bats Initialize-WSLUser.bats
     
     - name: Upload Test Results
       uses: actions/upload-artifact@v4

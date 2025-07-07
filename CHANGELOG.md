@@ -5,6 +5,25 @@ All notable changes to the MyExporter module will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-alpha.6] - 2025-07-06
+
+### Added
+- GuardRails compliance enforcement in CI pipeline
+- TelemetryCompliance.Tests.ps1 for telemetry pollution prevention
+- WSL user script idempotency testing with bats
+- Enhanced Verify-Phase.ps1 with CHANGELOG and [Pending] test checks
+
+### Changed
+- Removed ScriptsToProcess from manifest; classes now only dot-sourced in module
+- Enhanced FileList in manifest to include all runtime assets
+- Hardened Initialize-WSLUser.sh for idempotency and sudo-less environments
+- CI matrix now enforces GuardRails verification as a required gate
+
+### Fixed
+- Class loading issues in PowerShell 5.1 strict mode
+- Function name consistency (Assert-ContextPath vs Assert-ContextualPath)
+- Telemetry wrapper usage limited to ≤3 calls per Export-SystemInfo execution
+
 ## [0.1.0-alpha.5] - 2024-12-19
 
 ### Added
