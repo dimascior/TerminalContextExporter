@@ -68,7 +68,7 @@ Describe "Export-SystemInfo Parameter Block Regression Test" {
             $TestPath = Join-Path $env:TEMP "pester-test-output.json"
             
             # This should not throw an exception
-            { Export-SystemInfo -ComputerName "localhost" -OutputPath $TestPath -AsJson -WhatIf } | 
+            { Export-SystemInfo -ComputerName "localhost" -OutputPath $TestPath -Format "JSON" -AsJson -WhatIf } | 
                 Should -Not -Throw
         }
     }

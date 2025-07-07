@@ -21,7 +21,7 @@ jobs:
           - os: windows-latest
             psver: '7.4'
             shell: 'pwsh'
-          # Ubuntu with PowerShell 7.4 + WSL + tmux
+          # Ubuntu with PowerShell 7.4 + WSL + tmux  
           - os: ubuntu-latest
             psver: '7.4'
             shell: 'pwsh'
@@ -33,6 +33,13 @@ jobs:
             shell: 'pwsh'
             use_wsl: false
             install_tmux: false
+          # Ubuntu with WSL2 (additional WSL validation)
+          - os: ubuntu-latest
+            psver: '7.4'
+            shell: 'pwsh'
+            use_wsl: true
+            install_tmux: false
+            wsl_test: true
     
     steps:
     - uses: actions/checkout@v4

@@ -223,6 +223,83 @@ function Test-FileList {
         }
     }
     
+    # Check manifest FileList accuracy
+    $ManifestPath = "$PSScriptRoot\MyExporter.psd1"
+    if (Test-Path $ManifestPath) {
+        $ManifestData = Import-PowerShellDataFile $ManifestPath
+        $DeclaredFiles = $ManifestData.FileList
+        
+        if ($DeclaredFiles) {
+            # Get actual runtime files
+            $ActualFiles = @()
+            $ActualFiles += Get-ChildItem "$PSScriptRoot\*.ps*1" -File | ForEach-Object { $_.Name }
+            $ActualFiles += Get-ChildItem "$PSScriptRoot\Private\*.ps1" -File -ErrorAction SilentlyContinue | ForEach-Object { "Private\$($_.Name)" }
+            $ActualFiles += Get-ChildItem "$PSScriptRoot\Public\*.ps1" -File -ErrorAction SilentlyContinue | ForEach-Object { "Public\$($_.Name)" }
+            $ActualFiles += Get-ChildItem "$PSScriptRoot\Classes\*.ps1" -File -ErrorAction SilentlyContinue | ForEach-Object { "Classes\$($_.Name)" }
+            $ActualFiles += Get-ChildItem "$PSScriptRoot\Policies\*.yml" -File -ErrorAction SilentlyContinue | ForEach-Object { "Policies\$($_.Name)" }
+            if (Test-Path "$PSScriptRoot\Initialize-WSLUser.sh") { $ActualFiles += "Initialize-WSLUser.sh" }
+            
+            # Compare lists
+            $MissingFromManifest = $ActualFiles | Where-Object { $_ -notin $DeclaredFiles }
+            $ExtraInManifest = $DeclaredFiles | Where-Object { -not (Test-Path "$PSScriptRoot\$_") }
+            
+            if ($MissingFromManifest) {
+                $Issues += "Files missing from manifest FileList: $($MissingFromManifest -join ', ')"
+            }
+            if ($ExtraInManifest) {
+                $Issues += "Files in manifest FileList but not on disk: $($ExtraInManifest -join ', ')"
+            }
+        }
+    }
+    
+    return $Issues
+}
+
+function Test-ChangelogRequirement {
+    [CmdletBinding()]
+    param()
+    
+    $Issues = @()
+    
+    # Check for CHANGELOG.md existence
+    $ChangelogPath = Split-Path $PSScriptRoot -Parent | Join-Path -ChildPath "CHANGELOG.md"
+    if (-not (Test-Path $ChangelogPath)) {
+        $Issues += "CHANGELOG.md is required per GuardRails.md but not found"
+    } else {
+        # Check if CHANGELOG has been updated for public API or file set changes
+        $RecentCommits = git log --oneline -n 5 2>$null
+        if ($RecentCommits) {
+            $HasPublicChanges = $RecentCommits | Where-Object { 
+                $_ -match '\b(Public|API|parameter|function|class|interface)\b' 
+            }
+            if ($HasPublicChanges) {
+                $ChangelogContent = Get-Content $ChangelogPath -Raw
+                $Today = Get-Date -Format "yyyy-MM-dd"
+                if ($ChangelogContent -notmatch "\[$Today\]|\[Unreleased\]") {
+                    $Issues += "Recent public API changes detected but CHANGELOG.md not updated"
+                }
+            }
+        }
+    }
+    
+    return $Issues
+}
+
+function Test-PendingSpecs {
+    [CmdletBinding()]
+    param()
+    
+    $Issues = @()
+    
+    # Check for [Pending] test specifications
+    $TestFiles = Get-ChildItem "$PSScriptRoot\Tests\*.Tests.ps1" -ErrorAction SilentlyContinue
+    foreach ($TestFile in $TestFiles) {
+        $Content = Get-Content $TestFile.FullName -Raw
+        if ($Content -match '\[Pending\]') {
+            $Issues += "Test file $($TestFile.Name) contains [Pending] specifications - complete before phase completion"
+        }
+    }
+    
     return $Issues
 }
 
@@ -250,6 +327,16 @@ $AllIssues += $ApiIssues
 Write-PhaseStatus "Checking file tracking..." 'INFO'
 $FileIssues = Test-FileList
 $AllIssues += $FileIssues
+
+# 5. CHANGELOG requirement
+Write-PhaseStatus "Checking CHANGELOG.md..." 'INFO'
+$ChangelogIssues = Test-ChangelogRequirement
+$AllIssues += $ChangelogIssues
+
+# 6. Pending specifications
+Write-PhaseStatus "Checking for [Pending] test specs..." 'INFO'
+$PendingIssues = Test-PendingSpecs
+$AllIssues += $PendingIssues
 
 # Report results
 if ($AllIssues.Count -eq 0) {

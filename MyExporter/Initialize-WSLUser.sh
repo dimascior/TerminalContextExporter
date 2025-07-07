@@ -13,8 +13,11 @@ MYEXPORTER_HOME="/home/${MYEXPORTER_USER}"
 MYEXPORTER_SHELL="/bin/bash"
 LOG_FILE="/tmp/myexporter-init.log"
 
-# Idempotency helpers
-command -v sudo >/dev/null || sudo() { "$@"; }
+# Idempotency helpers - ensure commands work with or without sudo
+if ! command -v sudo >/dev/null; then
+    # In containers or environments without sudo, provide a pass-through
+    sudo() { "$@"; }
+fi
 
 # Logging function
 log() {

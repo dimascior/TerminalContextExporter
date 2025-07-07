@@ -2,16 +2,16 @@
 
 Describe "Class Loading Regression Test" {
     
+    BeforeAll {
+        # Ensure clean import for all tests in this file
+        Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
+        $ModulePath = Split-Path $PSCommandPath -Parent | Split-Path -Parent | Join-Path -ChildPath "MyExporter.psd1"
+        Import-Module $ModulePath -Force
+    }
+    
     Context "SystemInfo Class" {
         
         It "Should load SystemInfo class when module is imported" {
-            # Remove any existing module
-            Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
-            
-            # Import fresh
-            $ModulePath = Join-Path $PSScriptRoot ".." "MyExporter.psd1"
-            Import-Module $ModulePath -Force
-            
             # Test that the class is available
             { [SystemInfo] } | Should -Not -Throw
         }
