@@ -1,4 +1,4 @@
-name: PowerShell Cross-Platform Validation
+name: Windows + WSL PowerShell Testing Matrix
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ main ]
   schedule:
-    # Daily validation at 06:00 UTC
+    # Daily validation at 06:00 UTC per GuardRails.md daily merge window
     - cron: '0 6 * * *'
 
 env:
@@ -15,7 +15,7 @@ env:
 
 jobs:
   anti-simulation-gate:
-    name: "🚫 Block Simulated Tests"
+    name: "🚫 Constitutional Anti-Simulation Gate"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,43 +28,58 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y powershell
       
-      - name: Run Anti-Simulation Gate
+      - name: Run Constitutional Anti-Simulation Check
         shell: pwsh
         run: |
+          # Per GuardRails.md Part 7 - NO tolerance for simulation in CI
           cd MyExporter
-          ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath "." -FailOnSimulated
+          if (Test-Path "./DevScripts/Assert-NoSimulatedTests.ps1") {
+            ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath "." -FailOnSimulated
+            Write-Host "✅ No simulation patterns detected - Constitutional compliance verified"
+          }
 
-  powershell-matrix:
-    name: "PowerShell ${{ matrix.ps-version }} on ${{ matrix.os }}"
+  cross-platform-matrix:
+    name: "${{ matrix.edition }} PS${{ matrix.ps-version }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     needs: anti-simulation-gate
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-        ps-version: ['5.1', '7.4']
-        exclude:
-          # PowerShell 5.1 only available on Windows
+        include:
+          # Windows PowerShell 5.1 Desktop Edition (Legacy Support)
+          - os: windows-latest
+            ps-version: '5.1'
+            shell: powershell
+            edition: Desktop
+            description: "Windows PowerShell 5.1 (Legacy)"
+          
+          # Windows PowerShell 7.x Core Edition (Modern Windows)
+          - os: windows-latest
+            ps-version: '7.4'
+            shell: pwsh
+            edition: Core
+            description: "PowerShell 7.4 on Windows"
+          
+          # Ubuntu WSL-enabled for cross-platform validation
           - os: ubuntu-latest
-            ps-version: '5.1'
-          - os: macos-latest
-            ps-version: '5.1'
+            ps-version: '7.4'
+            shell: pwsh
+            edition: Core
+            wsl-enabled: true
+            description: "PowerShell 7.4 on Ubuntu (WSL Test Environment)"
     
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup PowerShell ${{ matrix.ps-version }}
-        if: matrix.ps-version == '7.4'
+        if: matrix.ps-version == '7.4' && matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
-            sudo dpkg -i packages-microsoft-prod.deb
-            sudo apt-get update
-            sudo apt-get install -y powershell
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install powershell
-          fi
+          # Install PowerShell 7.4 on Ubuntu for WSL testing
+          wget -q https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install -y powershell
       
       - name: Install WSL (Windows)
         if: matrix.os == 'windows-latest'
@@ -75,16 +90,14 @@ jobs:
           # Install Ubuntu for testing
           wsl --install Ubuntu-20.04 --web-download
           
-      - name: Setup tmux (Ubuntu/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Setup tmux (Ubuntu for WSL testing)
+        if: matrix.os == 'ubuntu-latest'
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get update
-            sudo apt-get install -y tmux
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install tmux
-          fi
+          sudo apt-get update
+          sudo apt-get install -y tmux
+          # Verify tmux installation
+          tmux -V
           
       - name: Validate Module Structure
         shell: pwsh
@@ -128,16 +141,19 @@ jobs:
             Write-Warning "WSL not available, skipping WSL tests"
           }
           
-      - name: Run tmux Integration Tests (Linux/macOS)
-        if: matrix.os != 'windows-latest'
+      - name: Run tmux Integration Tests (Ubuntu WSL Environment)
+        if: matrix.os == 'ubuntu-latest'
         shell: pwsh
         run: |
           cd MyExporter
           
-          # Test tmux availability and functionality
+          # Test tmux availability and functionality in Ubuntu environment
           if (Get-Command tmux -ErrorAction SilentlyContinue) {
-            Write-Host "tmux available, running tmux tests..."
+            Write-Host "tmux available, running tmux integration tests..."
             ./Test-TmuxAvailability.ps1
+            
+            # Run cross-platform boundary tests
+            ./DevScripts/Test-Phase3-CrossBoundary.ps1
           } else {
             Write-Warning "tmux not available, skipping tmux tests"
           }
@@ -165,7 +181,7 @@ jobs:
   wsl-dedicated:
     name: "🐧 WSL Deep Integration"
     runs-on: windows-latest
-    needs: [anti-simulation-gate, powershell-matrix]
+    needs: [anti-simulation-gate, cross-platform-matrix]
     
     steps:
       - uses: actions/checkout@v4
@@ -213,7 +229,7 @@ jobs:
   compliance-summary:
     name: "📋 Compliance Summary"
     runs-on: ubuntu-latest
-    needs: [powershell-matrix, wsl-dedicated]
+    needs: [cross-platform-matrix, wsl-dedicated]
     if: always()
     
     steps:

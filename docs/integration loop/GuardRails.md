@@ -1,8 +1,21 @@
-Of course. This is the definitive, fully elaborated **Unified Architecture Module**. It retains all previous information and integrates the new, highly detailed frameworks for adaptive AI collaboration and environment discovery. This document now represents a complete, end-to-end design specification, bridging high-level architecture with the granular, real-world complexities of cross-environment execution and pragmatic, AI-driven development.
+
+# GuardRails.md - module manifest (`MyExporter.psd1`) is the single source of truth for semantic versioning, platform gates, dependency injection, and compliance metadata. It is the **non-negotiable contract** for the entire project.
+
+*(This section remains unchanged, as the constitutional layer is intended to be rigid and non-negotiable.)*
+
+| Manifest Element | Expanded AI Reasoning Rule | Engineering Consequence |
+|:---|:---|:---|
+| **`GUID` & `ModuleVersion`** | "This is the module's unique identity and official version. I will use the `GUID` for unambiguous identification and the `ModuleVersion` for all semantic versioning logic, dependency resolution, and release management tasks." | Enables CI/CD & Dependency Management: Provides a stable, machine-readable identity for packaging, publishing, and resolving version-specific dependencies. |ifest Element | Expanded AI Reasoning Rule | Engineering Consequence |
+
+**⚠️ CRITICAL: This document is part of a modular organization that risks context fragmentation. ALWAYS read `docs/MASTER-CONTEXT-FRAMEWORK.md` first to maintain full-spectrum awareness and constitutional unity.**
+
+**Constitutional Authority:** This document serves as the immutable, authoritative reference for all MyExporter project development. No modification permitted - only indexing and referencing allowed.
+
+**Project Reference:** MyExporter PowerShell module located in project directory
+**Reference Location:** AgenticContextTools directory contains GuardRails implementation patterns
+**Purpose:** Constitutional foundation for all system boundary management, AI collaboration, and architectural compliance
 
 ---
-
-### **Unified Architecture Module: MyExporter — Dynamic & Adaptive Specification**
 
 **MyExporter** is conceived as a **living architecture**: a self-describing codebase whose manifest, directory topology, and idiomatic patterns form a continuously accurate reference manual. This specification now includes a dynamic framework to ensure that architectural compliance accelerates, rather than impedes, development by both human and AI agents.
 
@@ -10,7 +23,7 @@ Of course. This is the definitive, fully elaborated **Unified Architecture Modul
 
 ---
 
-### **Part 1: The Constitutional Layer — The Immutable Contract**
+## **PART 1: THE CONSTITUTIONAL LAYER - THE IMMUTABLE CONTRACT**
 
 The module manifest (`MyExporter.psd1`) is the single source of truth for semantic versioning, platform gates, dependency injection, and compliance metadata. It is the **non-negotiable contract** for the entire project.
 
@@ -32,12 +45,12 @@ The module manifest (`MyExporter.psd1`) is the single source of truth for semant
 
 ---
 
-### **Part 2: The Architectural Layer — Scaffolding, Patterns, and Dialect**
+## **PART 2: THE ARCHITECTURAL LAYER - SCAFFOLDING, PATTERNS, AND DIALECT**
 
 *(This section remains unchanged, as it defines the stable structure of the project.)*
 
 | Structural Unit | Granular Rule for Tool Selection | Optimisation & Maintainability Impact |
-| :--- | :--- | :--- |
+|:---|:---|:---|
 | **/Public** | Public scripts must confine themselves to orchestration. *No* `try/catch` except for parameter validation; error bubbling is handled centrally by a private telemetry wrapper. | Keeps entry points minimal, facilitating automated doc generation (`platyPS`) and reducing merge conflicts. |
 | **/Private** | Implementation scripts must be named verb-noun-platform.ps1 (e.g., `Get-SystemInfo.Linux.ps1`). Dispatchers live one level up (`Get-SystemInfo.ps1`) and load the correct variant via `$IsWindows`, `$IsMacOS`, `$IsLinux`. | Enables drop-in platform modules without touching existing code; Docker builds targeting Alpine simply skip Windows variants. |
 | **/Classes** | Every class must have a companion Pester test file under `/Tests/Classes` verifying `[ValidateScript]` blocks, custom methods, and JSON round-trip serialization. | Assures schema stability; TypeScript or Python consumers can rely on predictable field sets when deserialising CLI output. |
@@ -48,73 +61,58 @@ The module manifest (`MyExporter.psd1`) is the single source of truth for semant
 
 ---
 
-### **Part 3: The Implementation Layer — Patterns, Contracts, and Mentorship**
+## **PART 3: THE IMPLEMENTATION LAYER - PATTERNS, CONTRACTS, AND MENTORSHIP**
 
 *(This section remains unchanged, as it defines the ideal implementation patterns.)*
 
-#### **3.1 Data Contracts and Strong Typing**
+### **3.1 Data Contracts and Strong Typing**
 *   **`class SystemInfo`** now implements `IFormattable` and overrides `.ToString()` for human-friendly log output. AI referencing `$obj` in logging must call `$obj.ToString('table')` to honour custom formatting.
 *   **`[OutputType([SystemInfo])]`** in every public cmdlet powers VS Code IntelliSense through the PowerShell extension, improving developer ergonomics and reducing tab-completion ambiguity. This is the **Data Contract Enforcer**.
 
-#### **3.2 Telemetry and Exception Model**
+### **3.2 Telemetry and Exception Model**
 *   All private executor functions call **`Invoke-WithTelemetry`**, a wrapper adding:
     *   Correlation IDs (`[guid]::NewGuid()`) for each operation.
     *   `Stopwatch` timing for performance monitoring.
     *   Structured error objects (`[pscustomobject]@{Stage='Collect';Error=$_}`) that bubble to outer scopes.
 *   The top-level cmdlet converts native exceptions to a unified **`[MyExporter.ErrorRecord]`** class that surfaces fields **Code**, **Message**, and **SuggestedFix**—mirroring JSON error contracts exposed to Node.js and Python wrappers.
 
-#### **3.3 Idempotence and State Management**
+### **3.3 Idempotence and State Management**
 *   Persistent state lives under `$env:APPDATA\MyExporter\state.json` on Windows or `$XDG_STATE_HOME` on Linux/macOS.
 *   A **`StateFile`** class abstracts read/write operations with file locks (`[System.IO.FileShare]::None`), guaranteeing concurrency safety when multiple instances run in parallel (e.g., in tmux splits).
 
-#### **3.4 Concurrency Strategy**
+### **3.4 Concurrency Strategy**
 *   `ForEach-Object -Parallel` is gated behind an `$env:PS7_PARALLEL_LIMIT` environment variable; AI must respect this throttling so CI machines with few cores don’t overload.
 *   Linux/macOS variants fall back to `Start-Job` if PowerShell 7 parallelism is unavailable, providing graceful degradation.
 
-#### **3.5 Logging and Verbosity**
+### **3.5 Logging and Verbosity**
 *   A central **`Write-Log`** function writes to the console with `Write-Host` *only* when `$PSStyle.OutputRendering -eq 'Ansi'`; otherwise, it logs to a rotating file via `System.Diagnostics.TraceSource` for headless environments.
 *   Log levels map directly to PowerShell streams: Verbose → 4, Debug → 5, Information → 6. AI must route noisy diagnostics to `Write-Debug`, not `Write-Verbose`, to respect user-controlled verbosity toggles.
 
 ---
 
-### **Part 4: The Adaptive Collaboration Framework**
+## **PART 4: THE ADAPTIVE COLLABORATION FRAMEWORK**
 
 This section directly addresses the criticisms of over-specification and cognitive overhead. It provides a pragmatic, tiered approach to AI interaction, ensuring that architectural compliance is a tool, not a burden.
 
-#### **4.1 Progressive Context Anchoring with Isolate-Trace-Verify Methodology**
-This enhanced framework provides a systematic discipline for navigating complex codebases, addressing the limitations of the original three-level context system.
+### **4.1 Progressive Context Anchoring**
+To combat over-specification, AI prompts will use a tiered context model. The AI agent is instructed to request only the level of context necessary for the task at hand.
 
-*   **Level 1: Essential Context + Tactical Isolation**
-    *   **Purpose:** For simple, localized tasks where dependencies are minimal.
+*   **Level 1 - Essential Context (Always Include):** For simple, localized tasks.
     *   **CONTEXT:** WSL2 PowerShell 7.4+ environment. Working directory contains MyExporter module.
     *   **CONSTRAINTS:** Use cross-platform cmdlets. Avoid Windows-specific APIs unless wrapped.
-    *   **ESCAPE:** Use `-FastPath` mode for simple tasks.
-    *   **DISCIPLINE (Isolate-Trace-Verify):**
-        *   **Isolate:** Start with minimal file patterns (`Classes/SystemInfo.ps1`). Expand scope only if necessary.
-        *   **Trace:** Verify that `Import-Module` succeeds and the target class/function is available.
-        *   **Verify:** Prove the isolated component works (e.g., class instantiation) before integrating it.
-    *   **Application:** This was successfully used to fix the `SystemInfo` class for PowerShell 5.1 strict mode, requiring only one file change and a simple instantiation test.
+    *   **ESCAPE:** If task is simple and doesn't require architecture compliance, use `-FastPath` mode (a conceptual flag indicating a temporary bypass of architectural patterns).
 
-*   **Level 2: Architectural Context + Import Chain Tracing**
-    *   **Purpose:** For tasks involving multiple module components and their interactions.
+*   **Level 2 - Architectural Context (Include for Complex Tasks):** For tasks involving multiple components.
     *   **ARCHITECTURE:** Follow manifest-driven design. Public cmdlets orchestrate, private functions implement.
-    *   **TELEMETRY & SPLATTING:** Apply these patterns only where justified by debugging needs or parameter evolution.
-    *   **DISCIPLINE (Isolate-Trace-Verify):**
-        *   **Isolate:** Use precise globs to capture the set of interacting components (`Public/*.ps1`, `Private/Get-*.ps1`).
-        *   **Trace:** Follow the exact import order from the `.psm1` root module to understand the dependency chain.
-        *   **Verify:** Use "registries as truth sources." Compare the manifest's `FunctionsToExport` with the `Get-Module` cmdlet's `ExportedFunctions` to ensure consistency.
-    *   **Application:** This was used to design the job integration architecture, ensuring the `Start-Job` script block correctly loaded its dependencies in the right order.
+    *   **TELEMETRY:** Wrap operations with `Invoke-WithTelemetry` only if persistence/debugging is needed.
+    *   **SPLATTING:** Use parameter forwarding (`@Forward`) only when parameter evolution is expected.
 
-*   **Level 3: Environment-Specific Context + End-to-End Pipeline Verification**
-    *   **Purpose:** For tasks involving cross-platform logic, external processes, or environmental dependencies.
-    *   **WSL_PATHS, PARALLEL_LIMIT, DOCKER_SOCKET:** Apply these environment-specific rules.
-    *   **DISCIPLINE (Isolate-Trace-Verify):**
-        *   **Isolate:** Target environment-specific patterns (`*WSL*`, `*Linux*`, `*Windows*`).
-        *   **Trace:** Map the execution path through environment abstractions (`Get-ExecutionContext` → platform dispatch → specific implementation).
-        *   **Verify:** Execute the smallest possible end-to-end pipeline (`Export-SystemInfo -ComputerName localhost`) in each target environment to confirm the mental model. Use automated dependency analysis (`Get-Command`) to validate runtime availability.
-    *   **Application:** This was used to validate the cross-platform path resolution, confirming that `Join-Path` and `wslpath` produced correct paths in WSL, Windows, and GitBash.
+*   **Level 3 - WSL-Specific Context (Include for Cross-Platform Tasks):** For tasks involving environment interaction.
+    *   **WSL_PATHS:** Use `wslpath -w` for Windows executables. Normalize JSON paths to POSIX format.
+    *   **PARALLEL_LIMIT:** Respect `$env:PS7_PARALLEL_LIMIT`. Default to 2 if unset.
+    *   **DOCKER_SOCKET:** Verify `/var/run/docker.sock` exists before Docker operations.
 
-#### **4.2 Anti-Tail-Chasing Prompt Patterns**
+### **4.2 Anti-Tail-Chasing Prompt Patterns**
 To prevent the AI from getting stuck in compliance loops, prompts will be structured to prioritize the objective.
 
 *   **Task-First Prompt Structure:**
@@ -137,7 +135,7 @@ To prevent the AI from getting stuck in compliance loops, prompts will be struct
     3.  **PHASE 3:** "Finally, integrate the code from Phase 2 with the existing architecture (splatting, telemetry wrappers, etc.)."
     4.  **VALIDATE:** "Run the Pester tests for each phase before proceeding."
 
-#### **4.3 Context-Aware Bailout Triggers**
+### **4.3 Context-Aware Bailout Triggers**
 The AI is instructed to stop and ask for clarification if a task becomes unexpectedly complex, preventing it from over-engineering a solution.
 *   **BAILOUT_IF:**
     *   More than 3 files need modification for a seemingly simple change.
@@ -147,7 +145,7 @@ The AI is instructed to stop and ask for clarification if a task becomes unexpec
 
 ---
 
-### **Part 5: State Tracking and Context Preservation**
+## **PART 5: STATE TRACKING AND CONTEXT PRESERVATION**
 
 To prevent information loss during complex, multi-step operations, the AI will use physical artifacts to track its state, moving context from fragile conversational memory to durable files.
 
@@ -353,7 +351,7 @@ Export-SystemInfo -ComputerName 'localhost', 'WIN-DC01' -OutputPath '~/report.cs
 
 ### **Part 12: Environment Context Discovery Framework for AI Collaboration**
 
-*(This section remains unchanged, as it defines the technical implementation for environment discovery.)*
+This framework formalizes how Claude discovers, not assumes, the details of its execution environment. It transforms the AI from a generic script runner into a context-sensitive assistant, ensuring reliability and portability by minimizing fixed assumptions.
 
 #### **12.1 Automatic Environment Detection (Bootstrap Script)**
 *   **Purpose:** To provide Claude with an initial, comprehensive snapshot of the environment's state.

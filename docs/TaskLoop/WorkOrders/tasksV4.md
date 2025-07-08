@@ -1,4 +1,12 @@
+<!-- GUARDRAIL: Always begin by reading docs/integration loop/GuardRails.md Part 5 (State Tracking) -->
+<!-- MASTER CONTEXT VERSION: v1.2 (docs/MASTER-CONTEXT-FRAMEWORK.md) -->
+
 # TasksV4: Terminal Integration Implementation Plan
+
+**🚨 CONSTITUTIONAL GUARDRAIL BANNER 🚨**  
+**Authority:** All task definitions below derive from `docs/integration loop/GuardRails.md` constitutional framework  
+**Master Context:** Always validate against `docs/MASTER-CONTEXT-FRAMEWORK.md` before proceeding  
+**Mandatory Reading:** GuardRails.md Parts 1-3 → CLAUDE.md → Isolate-Trace-Verify-Loop.md
 
 **Generated:** July 6, 2025  
 **Framework:** GuardRails.md Dynamic & Adaptive Architecture  

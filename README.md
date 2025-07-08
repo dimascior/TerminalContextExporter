@@ -9,19 +9,36 @@ WorkflowDynamics/                    # Master Framework Implementation
 │   └── settings.local.json          # Claude IDE permissions and settings
 ├── .gitignore                       # Git exclusions (test outputs, temp files)
 ├── README.md                        # Framework documentation and usage guide
-├── docs/                            # Framework Knowledge Base & Analysis
-│   ├── GuardRails.md                # 🎯 PRIMARY FRAMEWORK SPECIFICATION
-│   ├── tasksV3.md                   # TasksV3 completion validation & methodology
-│   ├── CLAUDE.md                    # Prompt engineering templates for AI collaboration
-│   ├── Implementation-Status.md     # Detailed progress tracking and root cause analysis
-│   ├── operation-context.xml        # Operation manifest for complex tasks
-│   ├── CCSummary.md                 # Cross-platform context summary
-│   ├── MCD.md                       # Anti-pattern guidance (avoiding over-engineering)
-│   ├── claudeAgent.md               # AI agent interaction patterns
-│   ├── ChatgptDeepRe*.md           # Deep analysis iterations (V1/V2/V3)
-│   ├── WorkspaceAnalysis.md         # Workspace structure analysis
-│   ├── tasks*.md                    # Task evolution (tasks → tasksV2 → tasksV3)
-│   └── status.md                    # Development status tracking
+├── scripts/                         # 🛡️ CONSTITUTIONAL ENFORCEMENT AUTOMATION
+│   ├── verify_master_context.ps1    # PowerShell constitutional verification (enhanced Unicode)
+│   ├── verify_master_context.sh     # POSIX-compliant constitutional verification
+│   └── constitutional-verification-evidence.json # Validation evidence & audit trail
+├── docs/                            # Framework Knowledge Base & Analysis (Modular Organization)
+│   ├── MASTER-CONTEXT-FRAMEWORK.md # 🎯 FULL-SPECTRUM PROJECT AWARENESS & CONSTITUTIONAL UNITY
+│   ├── ThreeTierWorkflow.md         # Progressive context anchoring system with bailout triggers
+│   ├── AI-Agent-Project-Navigation-Report.md # Constitutional compliance documentation
+│   ├── integration loop/            # 🏛️ CONSTITUTIONAL FOUNDATION LAYER
+│   │   ├── GuardRails.md            # 🎯 PRIMARY FRAMEWORK SPECIFICATION (Parts 1-3)
+│   │   ├── CLAUDE.md                # AI collaboration framework (Parts 4-7)
+│   │   └── Claude_Prompting_Templates.md # Prompt engineering templates
+│   ├── TaskLoop/                    # 🔄 WORK EXECUTION DISCIPLINE LAYER
+│   │   ├── Isolate-Trace-Verify-Loop.md # Implementation execution discipline
+│   │   ├── build-suite-discipline.md    # Architectural build discipline
+│   │   └── WorkOrders/              # Task state tracking & evolution
+│   │       ├── tasks.md → tasksV5.md    # Task evolution (V1 through V5)
+│   │       └── [Current: tasksV5.md]    # Active project manager persistence
+│   ├── AssetRecords/                # 📊 PROGRESS TRACKING & EVIDENCE LAYER
+│   │   ├── Implementation-Status.md     # Current state tracking
+│   │   ├── Constitutional-Hooks-Implementation-Summary.md # Anti-drift enforcement status
+│   │   ├── status.md                    # Real-time progress tracking
+│   │   ├── CHANGELOG.md                 # Historical tracking & evidence correlation
+│   │   ├── operation-context.xml        # Operation manifest for complex tasks
+│   │   └── implementation-changes.md    # Change management tracking
+│   └── AgenticContextTools/         # 🤖 AI COLLABORATION TOOLS LAYER
+│       ├── CCSummary.md             # Cross-platform context summary
+│       ├── MCD.md                   # Anti-pattern guidance (avoiding over-engineering)
+│       ├── ChatgptDeepRe*.md        # Deep analysis iterations (V1/V2/V3)
+│       └── GuardRail.md             # Additional guardrail patterns
 └── MyExporter/                      # 🎯 REFERENCE IMPLEMENTATION MODULE
     ├── MyExporter.psd1              # Constitutional Layer - Immutable contracts
     ├── MyExporter.psm1              # Architectural Layer - Module orchestration
@@ -57,18 +74,62 @@ WorkflowDynamics/                    # Master Framework Implementation
 
 ---
 
-## 🎯 **Framework Layer Analysis (GuardRails.md Integration)**
+## 🎯 **Framework Layer Analysis (GuardRails.md Modular Integration)**
 
-### **1. Constitutional Layer (GuardRails.md Part 1)**
-**Files:** `MyExporter.psd1`, `.gitignore`, `settings.local.json`
+### **1. Constitutional Foundation Layer (docs/integration loop/)**
+**Primary Files:** `GuardRails.md`, `CLAUDE.md`, constitutional verification scripts
 
 | File | GuardRails Function | Framework Purpose |
 |------|-------------------|------------------|
-| **MyExporter.psd1** | **Immutable Contract** | Single source of truth for versioning, dependencies, and API surface. Implements manifest-driven architecture. |
-| **.gitignore** | **Artifact Control** | Prevents test output pollution in version control. Maintains clean constitutional state. |
-| **settings.local.json** | **AI Collaboration Contract** | Defines Claude IDE permissions. Establishes constitutional boundaries for AI interaction. |
+| **docs/integration loop/GuardRails.md** | **PRIMARY CONSTITUTION** | Immutable foundation (Parts 1-3). All system boundaries and constitutional law. |
+| **docs/integration loop/CLAUDE.md** | **AI Collaboration Framework** | Level 1-3 context anchoring, prompt templates, collaboration discipline. |
+| **scripts/verify_master_context.ps1/.sh** | **Constitutional Enforcement** | Automated validation of cross-document constitutional integrity. |
+| **docs/MASTER-CONTEXT-FRAMEWORK.md** | **Full-Spectrum Unity Restorer** | Bridges modular organization to prevent context fragmentation. |
 
-**Core Principle:** These files establish the **non-negotiable foundation** that all other layers must respect.
+**Core Principle:** These files establish the **non-negotiable constitutional foundation** that all other layers must respect.
+
+### **2. Work Execution Discipline Layer (docs/TaskLoop/)**
+**Primary Files:** Isolate-Trace-Verify methodology, build discipline, task evolution
+
+| Component | GuardRails Pattern | Architecture Purpose |
+|-----------|-------------------|---------------------|
+| **Isolate-Trace-Verify-Loop.md** | **Implementation Discipline** | Systematic work execution methodology. Evidence-based validation loops. |
+| **build-suite-discipline.md** | **Architectural Discipline** | Build system patterns and architectural compliance enforcement. |
+| **WorkOrders/tasksV5.md** | **Project Manager Persistence** | Active task state tracking. Work achievement clarity and continuity. |
+| **WorkOrders/tasks.md → tasksV5.md** | **Task Evolution Tracking** | Historical progression of task definitions and completion evidence. |
+
+**Core Principle:** Work discipline **prevents tail-chasing** and maintains **evidence-based progress** tracking.
+
+### **3. Progress Tracking & Evidence Layer (docs/AssetRecords/)**
+**Primary Files:** Implementation status, constitutional enforcement evidence, historical tracking
+
+| File | GuardRails Section | Implementation Purpose |
+|------|-------------------|----------------------|
+| **Implementation-Status.md** | **State Tracking** | Current implementation state, root cause analysis, progress correlation. |
+| **Constitutional-Hooks-Implementation-Summary.md** | **Anti-Drift Evidence** | Constitutional hook implementation status, enforcement mechanism validation. |
+| **status.md** | **Real-Time Progress** | Live development status tracking with cross-document correlation. |
+| **CHANGELOG.md** | **Historical Evidence** | Complete audit trail of all changes with constitutional compliance validation. |
+| **operation-context.xml** | **Complex Task Context** | Operation manifests for complex multi-boundary tasks. |
+
+### **4. AI Collaboration Tools Layer (docs/AgenticContextTools/)**  
+**Primary Files:** AI interaction patterns, analysis tools, anti-pattern guidance
+
+| Component | GuardRails Section | Collaboration Purpose |
+|-----------|-------------------|---------------------|
+| **CCSummary.md** | **Cross-Platform Context** | Platform-specific awareness and boundary management. |
+| **MCD.md** | **Anti-Pattern Guidance** | Prevents over-engineering, maintains pragmatic focus. |
+| **ChatgptDeepRe*.md** | **Deep Analysis Evolution** | Iterative analysis patterns (V1/V2/V3) for complex problems. |
+| **GuardRail.md** | **Additional Patterns** | Supplementary guardrail patterns and enforcement mechanisms. |
+
+### **5. Constitutional Enforcement Infrastructure**
+**Primary Files:** Automated validation, pre-commit hooks, evidence correlation
+
+| Component | Constitutional Function | Enforcement Purpose |
+|-----------|------------------------|-------------------|
+| **scripts/verify_master_context.ps1** | **PowerShell Constitutional Gate** | Enhanced Unicode support, Windows-compatible validation. |
+| **scripts/verify_master_context.sh** | **POSIX Constitutional Gate** | BusyBox/Dash compatible, cross-platform enforcement. |
+| **constitutional-verification-evidence.json** | **Audit Trail** | Evidence logging with timestamps, correlation IDs, validation status. |
+| **MyExporter/Pre-commit integration** | **Git-Level Enforcement** | Prevents commits without constitutional compliance validation. |
 
 ### **2. Architectural Layer (GuardRails.md Part 2)**  
 **Files:** `MyExporter.psm1`, `/Classes/`, `/Private/`, `/Public/` directory structure
@@ -119,15 +180,19 @@ WorkflowDynamics/                    # Master Framework Implementation
 ```powershell
 # CLAUDE PROMPT TEMPLATE:
 CONTEXT: MyExporter Dynamic & Adaptive Architecture project
+CONSTITUTIONAL_AUTHORITY: docs/integration loop/GuardRails.md Parts 1-3
+MASTER_CONTEXT: docs/MASTER-CONTEXT-FRAMEWORK.md (mandatory reading)
 TASK: [specific objective]
 FASTPATH: Use $env:MYEXPORTER_FAST_PATH=true for quick testing
 EXECUTE: Use claude-powershell-bridge.bat for validation
 
 # IMPLEMENTATION FLOW:
+0. Constitutional Validation: .\scripts\verify_master_context.ps1
 1. Edit MyExporter files (following GuardRails.md patterns)
 2. Execute: ./claude-powershell-bridge.bat
 3. Validate: FastPath mode testing with correlation IDs
 4. Verify: Output files contain expected data structure
+5. Evidence: Check constitutional-verification-evidence.json
 ```
 
 ### **Pattern 2: Level 2 (Architectural) Development Workflow**
@@ -135,6 +200,8 @@ EXECUTE: Use claude-powershell-bridge.bat for validation
 ```powershell
 # CLAUDE PROMPT TEMPLATE:
 CONTEXT: MyExporter GuardRails.md Level 2 (Architectural)
+CONSTITUTIONAL_READING: docs/integration loop/GuardRails.md → docs/integration loop/CLAUDE.md → docs/TaskLoop/Isolate-Trace-Verify-Loop.md
+MASTER_CONTEXT: Full-spectrum awareness via docs/MASTER-CONTEXT-FRAMEWORK.md
 TASK: [complex objective involving multiple components]
 PATTERNS: Apply GuardRails.md [specific section] methodology
 ISOLATE-TRACE-VERIFY: Use systematic component analysis
@@ -242,6 +309,15 @@ REM Provides evidence files for TasksV3 completion validation
 
 ## 🎯 **Framework Success Evidence & Validation**
 
+### **Constitutional Enforcement Evidence**
+All constitutional validation demonstrates successful anti-drift implementation:
+
+| File | Purpose | Constitutional Validation |
+|------|---------|--------------------------|
+| **scripts/constitutional-verification-evidence.json** | Automated constitutional compliance audit | Cross-document correlation validated |
+| **docs/AssetRecords/Constitutional-Hooks-Implementation-Summary.md** | Anti-drift enforcement status | Constitutional hooks active across all docs |
+| **scripts/verify_master_context.ps1/.sh** | Constitutional integrity validation | GuardRails.md authority chain intact |
+
 ### **TasksV3 Completion Artifacts**
 All validation files demonstrate successful GuardRails.md implementation:
 
@@ -253,10 +329,12 @@ All validation files demonstrate successful GuardRails.md implementation:
 | **final-test-normal.json** | 390 bytes | Normal mode JSON | Correlation ID telemetry successful |
 
 ### **Framework Methodology Validation**
-- ✅ **Constitutional Layer**: Manifest-driven contracts respected
-- ✅ **Architectural Layer**: Self-documenting structure maintained  
-- ✅ **Implementation Layer**: Job-safe execution with telemetry
-- ✅ **Adaptive Collaboration**: Progressive context anchoring applied
-- ✅ **AI Integration**: CLAUDE.md templates institutionalize success patterns
+- ✅ **Constitutional Foundation**: GuardRails.md authority established across modular organization
+- ✅ **Modular Unity**: MASTER-CONTEXT-FRAMEWORK.md prevents fragmentation, maintains full-spectrum awareness
+- ✅ **Work Execution Discipline**: TaskLoop/ methodology enforces Isolate-Trace-Verify evidence-based validation
+- ✅ **Progress Tracking**: AssetRecords/ provides comprehensive state tracking and audit trails
+- ✅ **AI Collaboration Tools**: AgenticContextTools/ maintains systematic AI interaction patterns
+- ✅ **Constitutional Enforcement**: Automated scripts ensure cross-document constitutional integrity
+- ✅ **Anti-Drift Mechanisms**: Constitutional hooks active, organizational modularity serving project goals
 
-**Project demonstrates complete GuardRails.md Dynamic & Adaptive Architecture implementation with 100% TasksV3 validation success.**
+**Project demonstrates complete GuardRails.md Dynamic & Adaptive Architecture implementation with modular organizational success, constitutional unity maintained, and 100% TasksV3 validation evidence.**

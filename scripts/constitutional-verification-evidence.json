@@ -1,0 +1,18 @@
+﻿{
+    "Timestamp":  {
+                      "value":  "\/Date(1751936399276)\/",
+                      "DisplayHint":  2,
+                      "DateTime":  "Monday, July 7, 2025 8:59:59 PM"
+                  },
+    "UnicodeSupport":  false,
+    "PowerShellVersion":  "5.1.19041.5965",
+    "ConstitutionalChecks":  {
+                                 "BailoutTriggers":  true,
+                                 "GuardRailsReference":  true,
+                                 "ExecutionBridges":  true,
+                                 "ProceedChecklist":  true,
+                                 "ConstitutionalBanners":  true
+                             },
+    "ValidationResult":  "PASSED",
+    "DocumentsChecked":  6
+}

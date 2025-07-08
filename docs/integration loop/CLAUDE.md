@@ -1,23 +1,55 @@
-🎯 Prompt Templates for MyExporter Project Suite
+# **AI Collaboration Framework — Constitutional Prompt Engineering**
 
-  Level 1: Essential Context (Simple Tasks)
+**⚠️ CONSTITUTIONAL FRAMEWORK NOTICE:**  
+This document serves as the **AI COLLABORATION FRAMEWORK** within the constitutional foundation layer (`integration loop/`). It provides systematic prompt engineering patterns that maintain constitutional compliance while enabling efficient AI-assisted development.
 
-  CONTEXT: MyExporter Dynamic & Adaptive Architecture project
-  TASK: [specific objective]
-  FASTPATH: Use $env:MYEXPORTER_FAST_PATH=true for quick testing
-  EXECUTE: Use claude-powershell-bridge.bat for validation
+**CONSTITUTIONAL AUTHORITY:** This document derives authority from and must comply with:
+1. **docs/integration loop/GuardRails.md** - Primary constitutional foundation (Parts 1-3)
+2. **docs/MASTER-CONTEXT-FRAMEWORK.md** - Full-spectrum awareness & anti-fragmentation
+3. **docs/TaskLoop/Isolate-Trace-Verify-Loop.md** - Work execution discipline
+4. **docs/AssetRecords/Implementation-Status.md** - Current state tracking
 
-  Example:
-  CONTEXT: MyExporter project with GuardRails.md framework
-  TASK: Implement real-time disk I/O monitoring with cross-platform WMI/proc integration
-  FASTPATH: Use Windows CIM first, add Linux /proc/diskstats parsing as TODO
-  EXECUTE: Test with claude-powershell-bridge.bat and validate telemetry correlation
+**UNIFIED GOAL ALIGNMENT:** All prompt patterns and AI collaboration tools documented here must serve the **primary unified goal** of delivering a constitutionally compliant, institutionally validated, AI-collaborative PowerShell module (MyExporter).
 
-  Level 2: Architectural Context (Complex Tasks)
+**ORGANIZATIONAL ROLE:** This document provides AI collaboration patterns within the constitutional foundation layer, ensuring that AI assistance **accelerates** rather than **impedes** unified goal achievement through systematic constitutional framework compliance.
 
-  CONTEXT: MyExporter GuardRails.md Level 2 (Architectural)
-  TASK: [complex objective involving multiple components]
-  PATTERNS: Apply GuardRails.md [specific section] methodology
+---
+
+## **🎯 Constitutional Prompt Templates for Systematic Development**
+
+### **Level 1: Essential Context + Constitutional Validation (Simple Tasks)**
+
+```
+CONSTITUTIONAL_AUTHORITY: docs/integration loop/GuardRails.md Parts 1-3
+CONTEXT: MyExporter Dynamic & Adaptive Architecture with constitutional compliance
+TASK: [specific objective]
+FASTPATH: Use $env:MYEXPORTER_FAST_PATH=true for quick testing
+CONSTITUTIONAL_VALIDATION: Verify GuardRails.md compliance
+EXECUTE: Use MyExporter systematic tools for validation
+```
+
+**Example:**
+```
+CONSTITUTIONAL_AUTHORITY: GuardRails.md Parts 1-3 acknowledged
+CONTEXT: MyExporter project with constitutional framework enforcement
+TASK: Implement real-time disk I/O monitoring with cross-platform WMI/proc integration
+FASTPATH: Use Windows CIM first, add Linux /proc/diskstats parsing as TODO
+CONSTITUTIONAL_VALIDATION: Verify against manifest requirements and cross-platform patterns
+EXECUTE: Test with enhanced-test-bridge.ps1 and validate systematic evidence correlation
+```
+
+### **Level 2: Architectural Context + Cross-Module Correlation (Complex Tasks)**
+
+```
+CONSTITUTIONAL_AUTHORITY: Full GuardRails.md + MASTER-CONTEXT-FRAMEWORK.md
+CONTEXT: MyExporter GuardRails.md Level 2 (Architectural) with systematic alignment
+TASK: [complex objective involving multiple organizational components]
+PATTERNS: Apply GuardRails.md [specific section] methodology
+ISOLATE-TRACE-VERIFY: Use systematic component analysis with constitutional validation
+CROSS_MODULE_CORRELATION: Validate against organizational structure requirements
+BAILOUT_IF: More than 3 files need modification OR constitutional compliance compromised
+EXECUTE: Full testing via MyExporter systematic phase validation tools
+```
   ISOLATE-TRACE-VERIFY: Use systematic component analysis
   BAILOUT_IF: More than 3 files need modification
   EXECUTE: Full testing via claude-wsl-launcher.sh
