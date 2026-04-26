@@ -82,7 +82,7 @@ jobs:
       shell: pwsh
       run: |
         if (Test-Path "MyExporter/DevScripts/Assert-NoSimulatedTests.ps1") {
-          & "MyExporter/DevScripts/Assert-NoSimulatedTests.ps1" -TestPath "MyExporter" -FailOnSimulated
+          & "MyExporter/DevScripts/Assert-NoSimulatedTests.ps1" -TestPath "MyExporter" -FailOnSimulation $true
           Write-Host "✅ Anti-simulation enforcement verified - Constitutional compliance confirmed" -ForegroundColor Green
         } else {
           Write-Warning "Anti-simulation script not found - creating constitutional requirement"

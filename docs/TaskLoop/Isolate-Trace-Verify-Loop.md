@@ -111,7 +111,7 @@ $WorkUnit = @{
 1. **Anti-Simulation Gate (GuardRails.md Part 7 - Round-Trip Validation)**
    ```powershell
    # Per GuardRails.md Part 7: "closes the loop, guaranteeing that any changes... will fail the CI pipeline"
-   .\DevScripts\Assert-NoSimulatedTests.ps1 -FailOnSimulated
+   .\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true
    # MUST pass before any result analysis per Constitutional Layer requirements
    ```
 
@@ -279,7 +279,7 @@ jobs:
       shell: ${{ matrix.shell }}
       run: |
         # Per GuardRails.md Part 7 - NO tolerance for simulation in CI
-        ./MyExporter/DevScripts/Assert-NoSimulatedTests.ps1 -FailOnSimulated
+        ./MyExporter/DevScripts/Assert-NoSimulatedTests.ps1 -TestPath ./MyExporter -FailOnSimulation $true
         
     - name: Cross-Edition Pester Suite
       shell: ${{ matrix.shell }}
@@ -331,7 +331,7 @@ jobs:
       run: |
         # Per GuardRails.md Part 2: Pipeline Definition must validate all platforms
         Import-Module ./MyExporter -Force
-        ./DevScripts/Assert-NoSimulatedTests.ps1 -FailOnSimulated
+        ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true
         ./Verify-Phase.ps1 -Phase "cross-platform" -Edition "${{ matrix.edition }}"
     
     - name: Execute Full Pester Suite
@@ -528,7 +528,7 @@ $Evidence = @{
 **VERIFY:**
 ```powershell
 # Anti-simulation check
-.\DevScripts\Assert-NoSimulatedTests.ps1 -FailOnSimulated  # PASS
+.\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true  # PASS
 
 # Boundary reality check  
 Test-BoundaryReality -Evidence tmux-test-evidence-847.json  # PASS - real tmux output detected

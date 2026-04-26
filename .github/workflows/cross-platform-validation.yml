@@ -34,7 +34,7 @@ jobs:
           # Per GuardRails.md Part 7 - NO tolerance for simulation in CI
           cd MyExporter
           if (Test-Path "./DevScripts/Assert-NoSimulatedTests.ps1") {
-            ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath "." -FailOnSimulated
+            ./DevScripts/Assert-NoSimulatedTests.ps1 -TestPath "." -FailOnSimulation $true
             Write-Host "✅ No simulation patterns detected - Constitutional compliance verified"
           }
 

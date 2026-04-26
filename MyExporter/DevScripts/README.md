@@ -2,6 +2,27 @@
 
 DevScripts implements the CI/CD validation pipeline described in the main README.
 
+## Quick Start
+
+Run the complete 5-phase pipeline:
+
+```powershell
+cd MyExporter
+.\DevScripts\Run-FullPipeline.ps1
+```
+
+This orchestrator runs all phases in sequence and stops on first failure. Exit code 0 = ready for merge.
+
+**For individual phase testing:**
+
+| Phase | Command | Purpose |
+|-------|---------|---------|
+| 1 | `.\DevScripts\Test-Phase1-Compliance.ps1` | Constitutional docs |
+| 2 | `.\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true` | Anti-simulation check |
+| 3 | `.\DevScripts\Test-Phase3-CrossBoundary.ps1` | Matrix validation |
+| 4 | `.\DevScripts\New-ComplianceFinalJson.ps1 -EvidencePath ./.artifacts/evidence/local` | Aggregation |
+| 5 | `.\DevScripts\Test-Phase5-Security.ps1` | Security scan |
+
 ## Scripts Overview
 
 ### Job 1: Constitutional Verification
@@ -20,8 +41,15 @@ Zero-tolerance policy: scans test files for Mock, Sentinel, Simulate, FakeData p
 Any pattern found blocks merge.
 
 ```powershell
-.\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests
+# Correct parameters (CI calling convention):
+.\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true
 ```
+
+**Parameters:**
+- `-TestPath`: Path to scan for simulated tests (required)
+- `-FailOnSimulation`: Boolean - if $true, throw terminating error on detection (default: $true)
+
+**Note:** Use `-FailOnSimulation` (not `-FailOnSimulated`)
 
 ### Job 3: Systematic Validation Matrix
 **File:** `Test-Phase3-CrossBoundary.ps1`
@@ -76,6 +104,15 @@ Pre-commit hook for validating commit message format.
 
 ## Running Full Pipeline Locally
 
+Easiest way - use the orchestrator:
+
+```powershell
+cd MyExporter
+.\DevScripts\Run-FullPipeline.ps1
+```
+
+Or run phases manually (useful for debugging):
+
 ```powershell
 cd MyExporter
 
@@ -84,7 +121,7 @@ cd MyExporter
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 # Phase 2: Anti-Simulation
-.\DevScripts\Assert-NoSimulatedTests.ps1
+.\DevScripts\Assert-NoSimulatedTests.ps1 -TestPath ./Tests -FailOnSimulation $true
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 # Phase 3: Matrix Validation
@@ -92,13 +129,13 @@ if ($LASTEXITCODE -ne 0) { exit 1 }
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 # Phase 4: Compliance Aggregation
-.\DevScripts\New-ComplianceFinalJson.ps1
+.\DevScripts\New-ComplianceFinalJson.ps1 -EvidencePath ./.artifacts/evidence/local
 if ($LASTEXITCODE -ne 0) { exit 1 }
 
 # Phase 5: Security Scan
 .\DevScripts\Test-Phase5-Security.ps1
 
-echo "✓ ALL GATES PASSED"
+echo "All gates PASSED - ready for merge"
 ```
 
 ## Evidence Files Generated
@@ -112,6 +149,47 @@ Each job produces evidence files in `.artifacts/`:
 | Job 3 | `evidence-local-[timestamp].json` | Per-leg test results |
 | Job 4 | `compliance-final.json` | Final aggregated decision |
 | Job 5 | `security-scan-results.json` | Security findings |
+
+## Parameters Reference
+
+**Assert-NoSimulatedTests.ps1** (Job 2)
+```powershell
+-TestPath <string>           # Required: Path to scan for simulated tests (e.g., ./Tests)
+-FailOnSimulation <bool>     # Optional: Throw error if patterns detected (default: $true)
+                             # Use $true for CI, $false for warnings only
+```
+
+**New-ComplianceFinalJson.ps1** (Job 4)
+```powershell
+-EvidencePath <string>       # Optional: Path to evidence files (default: ./.artifacts/evidence/local)
+-OutputPath <string>         # Optional: Where to write compliance-final.json (default: .)
+```
+
+**Invoke-FreshSession.ps1** (Utility)
+```powershell
+-ScriptBlock <scriptblock>   # Required: PowerShell code to execute in isolated session
+-SessionTag <string>         # Optional: Label for job tracking
+-Wait <bool>                 # Optional: Wait for job completion (default: $true)
+```
+
+**Validate-CommitMessage.ps1** (Pre-commit hook)
+```powershell
+-CommitMessageFile <string>  # Optional: Path to commit message (default: .git/COMMIT_EDITMSG)
+```
+
+**Run-FullPipeline.ps1** (Orchestrator)
+```powershell
+# No parameters - runs all 5 phases automatically
+./DevScripts/Run-FullPipeline.ps1
+```
+
+**Test-Phase1-Compliance.ps1**, **Test-Phase3-CrossBoundary.ps1**, **Test-Phase5-Security.ps1**
+```powershell
+# No parameters required
+.\DevScripts\Test-Phase1-Compliance.ps1
+.\DevScripts\Test-Phase3-CrossBoundary.ps1
+.\DevScripts\Test-Phase5-Security.ps1
+```
 
 ## Future Enhancements
 
