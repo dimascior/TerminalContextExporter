@@ -1368,6 +1368,159 @@ git log -1 --oneline
 # Output: abc12345 (Level 1: Add network interface...)
 ```
 
+### Commit Message Anatomy: Compliance System Validation
+
+Every commit message is parsed by pre-commit hooks and CI gates to enforce constitutional governance:
+
+```
+┌─ GOVERNANCE TIER DECLARATION
+│
+Level 1: Add network interface property to SystemInfo
+│        └─ SHORT TITLE (50 chars max, present tense verb)
+│           CI Check: File count ≤ 3, no architecture changes
+│
+Added NetworkInterfaces array to support interface enumeration.
+Follows CorrelationId threading pattern for traceability.
+Real system data validated in test evidence.
+│
+└─ BODY DESCRIPTION (Present state after change)
+   CI Check: Search for "Mock", "Sentinel", "Simulate" - any match fails Job 2
+   Validates: Real system calls only, no artificial test data
+   
+CONSTITUTIONAL_AUTHORITY: GuardRails.md Parts 1-3
+│                         └─ CITE PRIMARY GOVERNANCE DOCUMENT
+│                            CI Check: Reference points pre-commit and Job 1
+│                            Validation: Commit author must cite which GuardRails section applies
+│                            Enforcement: Enables traceability to constitutional rules
+│
+EVIDENCE: evidence-2025-07-06-1430.json (390 bytes)
+│          └─ GENERATED EVIDENCE FILE FROM LOCAL TESTING
+│             CI Check: File must exist locally and be uploaded to CI
+│             Size validation: > 100 bytes (ensures real data, not empty)
+│             Format validation: JSON schema compliance in Job 4
+│             Purpose: Proof that changes were tested with real system data
+│
+CORRELATION_ID: 0aa9f484-8203-47fa-a5ec-46e109c2e11f
+               └─ TRACE ID THREADING THROUGH ENTIRE OPERATION
+                  CI Check: Must be valid GUID format
+                  Connection: Links commit → evidence file → tests → CI logs
+                  Purpose: Root cause analysis - trace any failure back to source
+```
+
+**Field-by-Field Governance Mapping:**
+
+| Commit Field | Governance Purpose | CI Job Check | Pre-Commit Check | What Fails This |
+|--------------|-------------------|------------|-----------------|-----------------|
+| **Level N:** | Declares scope (1-3 files, 1-7 files, unlimited) | Job 1 Manifest | Must exist, N must be 1,2, or 3 | Missing or invalid number |
+| **Title** | Short summary (verb + change) | Job 3 Docs | 50 char max | Exceeds 50 chars or no verb |
+| **Body** | Real system data proof | Job 2 Anti-Simulation | Rejects Mock/Sentinel/Simulate keywords | Contains simulation patterns |
+| **CONSTITUTIONAL_AUTHORITY** | Guards against drift | Job 1 Constitutional | Must reference GuardRails.md section | Missing or cites wrong doc |
+| **EVIDENCE** | Test result proof | Job 4 Compliance | File must exist & > 100 bytes | File missing, too small, or invalid JSON |
+| **CORRELATION_ID** | End-to-end traceability | Job 3 Telemetry | Must be valid GUID | Invalid format or missing |
+
+**Real Examples of Failing Commits:**
+
+```bash
+# ❌ FAILS: No "Level" declaration
+git commit -m "Add network interface property
+
+EVIDENCE: evidence-2025-07-06-1430.json"
+
+# ❌ FAILS: Wrong level (Level 4 doesn't exist)
+git commit -m "Level 4: Redesign entire system architecture"
+
+# ❌ FAILS: Uses simulation patterns (Job 2 blocks)
+git commit -m "Level 1: Add CPU monitoring
+
+Used Mock Get-CimInstance for testing.
+EVIDENCE: evidence-2025-07-06-1430.json"
+
+# ❌ FAILS: CONSTITUTIONAL_AUTHORITY cites wrong document
+git commit -m "Level 1: Add network interface property
+
+CONSTITUTIONAL_AUTHORITY: README.md
+EVIDENCE: evidence-2025-07-06-1430.json"
+
+# ❌ FAILS: EVIDENCE file doesn't exist or < 100 bytes
+git commit -m "Level 1: Add network interface property
+
+CONSTITUTIONAL_AUTHORITY: GuardRails.md Parts 1-3
+EVIDENCE: missing-file.json (0 bytes)"
+
+# ✅ PASSES: Complete, valid commit
+git commit -m "Level 1: Add network interface property to SystemInfo
+
+Added NetworkInterfaces array to support enumeration across platforms.
+Follows CorrelationId threading pattern for traceability.
+Windows implementation: Get-CimInstance Win32_NetworkAdapterConfiguration
+Linux implementation: /sbin/ip link show
+Real system data validated in test evidence.
+
+CONSTITUTIONAL_AUTHORITY: GuardRails.md Parts 1-3 (Platform Implementation)
+EVIDENCE: evidence-2026-04-26-1134.json (2586 bytes)
+CORRELATION_ID: 0aa9f484-8203-47fa-a5ec-46e109c2e11f"
+```
+
+**How CI Gates Validate Each Field:**
+
+**Pre-Commit Hook (Local):**
+```
+1. PARSE "Level N:" → Extract N value
+   ├─ If N not in [1,2,3] → REJECT
+   └─ File count must match:
+      ├─ Level 1: 1-3 files
+      ├─ Level 2: 1-7 files
+      └─ Level 3: unlimited
+
+2. SEARCH body for simulation keywords → REJECT if found
+   ├─ "Mock" → FAIL
+   ├─ "Sentinel" → FAIL
+   ├─ "Simulate" → FAIL
+   └─ "FakeData" → FAIL
+
+3. VERIFY CONSTITUTIONAL_AUTHORITY format
+   └─ Must cite: docs/integration loop/GuardRails.md (or other approved docs)
+```
+
+**Job 1 - Constitutional Verification:**
+```
+1. CHECK: CONSTITUTIONAL_AUTHORITY references valid document
+   └─ Approved sources:
+      ├─ docs/integration loop/GuardRails.md
+      ├─ docs/integration loop/CLAUDE.md
+      ├─ docs/TaskLoop/Isolate-Trace-Verify-Loop.md
+      └─ docs/MASTER-CONTEXT-FRAMEWORK.md
+
+2. ACTION: If reference invalid → CONSTITUTIONAL_BAILOUT
+```
+
+**Job 2 - Anti-Simulation Enforcement:**
+```
+1. SCAN: Commit message body for mock/sentinel patterns
+2. SCAN: All changed test files for Mock keyword
+3. VERDICT:
+   └─ Any match → Job 2 FAIL → Merge blocked
+```
+
+**Job 3 - Matrix Validation:**
+```
+1. EXTRACT: CORRELATION_ID from commit message
+2. SEARCH: evidence-[CorrelationId].json in artifacts
+3. VALIDATE:
+   ├─ File exists
+   ├─ File > 100 bytes (real data check)
+   ├─ JSON schema compliance
+   └─ CorrelationId matches
+```
+
+**Job 4 - Compliance Aggregation:**
+```
+1. READ: EVIDENCE filename and byte size
+2. VERIFY: File exists in CI artifacts
+3. AGGREGATE: All matrix legs + evidence files
+4. DECISION: Ready flag = all checks PASS
+```
+
 ### Phase 3: Push to Remote
 
 ```bash

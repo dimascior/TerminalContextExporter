@@ -3,8 +3,7 @@
 *.psc1
 *.vscode/
 
-# DevScripts - development and test helpers (not formal Pester tests)
-MyExporter/DevScripts/
+# Test helpers specific to development (temporary test scripts)
 test-params.ps1
 test_claude_analysis.ps1
 claude-*-test.sh
