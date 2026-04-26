@@ -263,8 +263,13 @@ jobs:
       run: |
         # Run enhanced test bridge for comprehensive evidence capture
         if (Test-Path "${{ github.workspace }}/MyExporter/enhanced-test-bridge.ps1") {
-          & "${{ github.workspace }}/MyExporter/enhanced-test-bridge.ps1" -TestScenario "All" -CaptureEvidence
-          Write-Host "✅ Enhanced test bridge completed with evidence capture" -ForegroundColor Green
+          Push-Location "${{ github.workspace }}/MyExporter"
+          try {
+            & "./enhanced-test-bridge.ps1" -TestScenario "All" -CaptureEvidence
+            Write-Host "✅ Enhanced test bridge completed with evidence capture" -ForegroundColor Green
+          } finally {
+            Pop-Location
+          }
         } else {
           Write-Warning "Enhanced test bridge not found - systematic evidence capture may be incomplete"
         }
