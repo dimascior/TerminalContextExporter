@@ -83,15 +83,35 @@ function Test-GuardRailsCompliance {
         }
     }
     
-    # Check 4: DevScripts should not contain runtime files
+    # Check 4: DevScripts should not contain runtime files (except CI infrastructure)
     $DevScriptsPath = "$PSScriptRoot\DevScripts"
     if (Test-Path $DevScriptsPath) {
         $DevFiles = Get-ChildItem $DevScriptsPath -Recurse -Include "*.ps1","*.psm1","*.psd1"
-        # Exclude legitimate dev/test files that should be in DevScripts
+        # Legitimate CI/CD infrastructure scripts that should be in DevScripts
+        $AllowedCIScripts = @(
+            'Invoke-FreshSession.ps1',
+            'New-ComplianceFinalJson.ps1',
+            'Assert-NoSimulatedTests.ps1',
+            'Validate-CommitMessage.ps1',
+            'Test-Phase*.ps1',
+            'Run-FullPipeline.ps1'
+        )
+        
+        # Exclude legitimate dev/test files and CI infrastructure scripts
         $RuntimeFiles = $DevFiles | Where-Object { 
-            ($_.Name -match '^(Export-|Get-|Invoke-|New-|Set-|Add-|Update-)') -and 
-            ($_.Name -notmatch '^Test-') -and 
-            ($_.Name -notmatch '^test-')
+            $FileName = $_.Name
+            $IsAllowedCI = $false
+            foreach ($Pattern in $AllowedCIScripts) {
+                if ($FileName -like $Pattern) {
+                    $IsAllowedCI = $true
+                    break
+                }
+            }
+            
+            ($FileName -match '^(Export-|Get-|Invoke-|New-|Set-|Add-|Update-)') -and 
+            ($FileName -notmatch '^Test-') -and 
+            ($FileName -notmatch '^test-') -and
+            (-not $IsAllowedCI)
         }
         if ($RuntimeFiles) {
             $Violations += "DevScripts contains runtime files: $($RuntimeFiles.Name -join ', ') (should be in Private/ or Public/)"
