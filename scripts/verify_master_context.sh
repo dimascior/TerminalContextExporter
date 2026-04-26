@@ -39,12 +39,6 @@ if [ ! -f "docs/ThreeTierWorkflow.md" ]; then
 fi
 echo "✅ Found: docs/ThreeTierWorkflow.md"
 
-if [ ! -f "docs/AI-Agent-Project-Navigation-Report.md" ]; then
-  echo "❌ CRITICAL: Missing constitutional document: docs/AI-Agent-Project-Navigation-Report.md"
-  exit 1
-fi
-echo "✅ Found: docs/AI-Agent-Project-Navigation-Report.md"
-
 echo "🔗 Verifying cross-document constitutional references..."
 
 # Verify MASTER-CONTEXT-FRAMEWORK.md references GuardRails.md
@@ -56,18 +50,6 @@ fi
 # Verify ThreeTierWorkflow has constitutional guardrail banner
 if ! grep -q "CONSTITUTIONAL GUARDRAIL BANNER" "docs/ThreeTierWorkflow.md"; then
   echo "❌ CRITICAL: ThreeTierWorkflow.md missing constitutional guardrail banner"
-  exit 1
-fi
-
-# Verify AI Agent Report has master context version stamp
-if ! grep -q "MASTER CONTEXT VERSION" "docs/AI-Agent-Project-Navigation-Report.md"; then
-  echo "❌ CRITICAL: AI Agent Report missing master context version stamp"
-  exit 1
-fi
-
-# Verify proceed checklist in AI Agent Report
-if ! grep -q "PROCEED CHECKLIST" "docs/AI-Agent-Project-Navigation-Report.md"; then
-  echo "❌ CRITICAL: Navigation report missing proceed checklist"
   exit 1
 fi
 

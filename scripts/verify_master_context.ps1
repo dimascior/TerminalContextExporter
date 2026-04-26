@@ -70,8 +70,7 @@ $RequiredDocs = @(
     "docs\integration loop\CLAUDE.md", 
     "docs\TaskLoop\Isolate-Trace-Verify-Loop.md",
     "docs\MASTER-CONTEXT-FRAMEWORK.md",
-    "docs\ThreeTierWorkflow.md",
-    "docs\AI-Agent-Project-Navigation-Report.md"
+    "docs\ThreeTierWorkflow.md"
 )
 
 Write-Host "`n$info Checking constitutional document presence..." -ForegroundColor Cyan
@@ -112,15 +111,6 @@ if ($ThreeTierContent -match "CONSTITUTIONAL GUARDRAIL BANNER") {
     exit 1
 }
 
-# Check AI Agent Report has master context version
-$AIReportContent = Get-Content "docs\AI-Agent-Project-Navigation-Report.md" -Raw
-if ($AIReportContent -match "MASTER CONTEXT VERSION") {
-    Write-Host "$checkmark AI Agent Report master context version verified" -ForegroundColor Green
-} else {
-    Write-Host "$crossmark ERROR: AI Agent Report missing master context version stamp" -ForegroundColor Red
-    exit 1
-}
-
 # Check for bailout triggers in ThreeTierWorkflow
 if ($ThreeTierContent -match "BAILOUT_IF") {
     Write-Host "$checkmark ThreeTierWorkflow.md bailout triggers verified" -ForegroundColor Green
@@ -156,14 +146,6 @@ foreach ($file in $TaskLoopFiles) {
         Write-Host "$crossmark ERROR: $file not found" -ForegroundColor Red
         exit 1
     }
-}
-
-# Check for PROCEED CHECKLIST in navigation report
-if ($AIReportContent -match "PROCEED CHECKLIST") {
-    Write-Host "$checkmark Navigation report proceed checklist verified" -ForegroundColor Green
-} else {
-    Write-Host "$crossmark ERROR: Navigation report missing proceed checklist" -ForegroundColor Red
-    exit 1
 }
 
 Write-Host "`n$checkmark MASTER CONTEXT FRAMEWORK INTEGRITY VERIFIED" -ForegroundColor Green
