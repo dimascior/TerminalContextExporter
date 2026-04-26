@@ -1,0 +1,101 @@
+﻿{
+    "SecurityValidation":  {
+                               "Status":  "PENDING",
+                               "TrivyScan":  "NOT_RUN"
+                           },
+    "AggregatedSummary":  {
+                              "ChangelogUpdated":  true,
+                              "TotalMatrixLegs":  3,
+                              "NoSimulationDetected":  true,
+                              "Ready":  false,
+                              "TotalFailed":  3,
+                              "LegsWithPassStatus":  0,
+                              "AllRequiredFilesPresent":  true
+                          },
+    "ChangeMetadata":  {
+                           "BailoutTriggered":  false,
+                           "ContextLevel":  0,
+                           "ChangelogUpdated":  true
+                       },
+    "ConstitutionalVerification":  {
+                                       "Status":  "PASS",
+                                       "DocsRequired":  [
+                                                            "docs/integration loop/GuardRails.md",
+                                                            "docs/MASTER-CONTEXT-FRAMEWORK.md",
+                                                            "docs/TaskLoop/Isolate-Trace-Verify-Loop.md",
+                                                            "docs/AssetRecords/Implementation-Status.md"
+                                                        ],
+                                       "DocsPresent":  [
+                                                           {
+                                                               "Document":  "docs/integration loop/GuardRails.md",
+                                                               "Present":  true
+                                                           },
+                                                           {
+                                                               "Document":  "docs/MASTER-CONTEXT-FRAMEWORK.md",
+                                                               "Present":  true
+                                                           },
+                                                           {
+                                                               "Document":  "docs/TaskLoop/Isolate-Trace-Verify-Loop.md",
+                                                               "Present":  true
+                                                           },
+                                                           {
+                                                               "Document":  "docs/AssetRecords/Implementation-Status.md",
+                                                               "Present":  true
+                                                           }
+                                                       ]
+                                   },
+    "AntiSimulationEnforcement":  {
+                                      "Status":  "ENFORCED",
+                                      "ProveRealDataUsed":  "NOT_VERIFIED",
+                                      "AssertNoSimulatedTests":  "PASS"
+                                  },
+    "ReportMetadata":  {
+                           "ReportId":  "compliance-final-20260426-1350",
+                           "CommitSHA":  "7c6be2a",
+                           "ReportTime":  "2026-04-26T13:50:47.5128477-04:00"
+                       },
+    "MatrixResults":  [
+                          {
+                              "Size":  3929,
+                              "NoSimulationDetected":  true,
+                              "File":  "constitutional-verification-2026-04-26-1350.json",
+                              "ValidationStatus":  "FAIL",
+                              "Tests":  {
+                                            "Failed":  null,
+                                            "Total":  null,
+                                            "Passed":  null
+                                        },
+                              "OverallStatus":  null,
+                              "CommitSHA":  "7c6be2a",
+                              "CorrelationId":  "6291472e-0145-4e00-b418-a1098b610bb2"
+                          },
+                          {
+                              "Size":  270,
+                              "NoSimulationDetected":  true,
+                              "File":  "anti-simulation-report-2026-04-26-1350.json",
+                              "ValidationStatus":  "FAIL",
+                              "Tests":  {
+                                            "Failed":  null,
+                                            "Total":  null,
+                                            "Passed":  null
+                                        },
+                              "OverallStatus":  null,
+                              "CommitSHA":  "7c6be2a",
+                              "CorrelationId":  null
+                          },
+                          {
+                              "Size":  3408,
+                              "NoSimulationDetected":  true,
+                              "File":  "security-scan-2026-04-26-1350.json",
+                              "ValidationStatus":  "FAIL",
+                              "Tests":  {
+                                            "Failed":  null,
+                                            "Total":  null,
+                                            "Passed":  null
+                                        },
+                              "OverallStatus":  null,
+                              "CommitSHA":  "7c6be2a",
+                              "CorrelationId":  "8853ccdf-c323-4538-a09e-e3b1054b2419"
+                          }
+                      ]
+}

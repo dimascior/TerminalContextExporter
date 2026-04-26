@@ -39,10 +39,12 @@ $ForbiddenPatterns = @(
 $GitSHA = git rev-parse --short HEAD 2>$null
 if ([string]::IsNullOrEmpty($GitSHA)) { $GitSHA = "unknown" }
 
+$ResolvedPath = if (Test-Path $TestPath) { (Resolve-Path $TestPath).Path } else { $TestPath }
+
 $Report = @{
     Timestamp = Get-Date -Format 'O'
     CommitSHA = $GitSHA
-    ScanPath = (Resolve-Path $TestPath).Path
+    ScanPath = $ResolvedPath
     ForbiddenPatterns = @()
     PatternMatches = @()
     OverallStatus = "PASS"

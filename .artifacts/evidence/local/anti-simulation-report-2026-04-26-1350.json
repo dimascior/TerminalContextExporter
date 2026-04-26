@@ -1,0 +1,12 @@
+﻿{
+    "CommitSHA":  "7c6be2a",
+    "ScanPath":  "./Tests",
+    "OverallStatus":  "PASS",
+    "Timestamp":  "2026-04-26T13:50:37.5713346-04:00",
+    "PatternMatches":  [
+
+                       ],
+    "ForbiddenPatterns":  [
+
+                          ]
+}
