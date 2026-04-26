@@ -129,7 +129,7 @@ foreach ($File in $CodeFiles) {
     $Content = Get-Content -Path $File.FullName -Raw -ErrorAction SilentlyContinue
     
     # Check for PS 7+ only operators (simple string matching, not regex to avoid parsing)
-    if ($Content.Contains('??') -or $Content.Contains('?:')) {
+    if ($Content -and ($Content.Contains('??') -or $Content.Contains('?:'))) {
         $PSVersionIssues += @{
             File = $File.Name
             Issue = "PowerShell 7+ only operators detected"

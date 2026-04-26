@@ -83,9 +83,10 @@ if ($TestScenario -in @("All", "BasicFunctionality")) {
     Write-Host "`n--- REAL TEST: Basic Module Functionality ---" -ForegroundColor Yellow
     
     try {
-        # Clean import
+        # Clean import - use script directory for module path
         Remove-Module MyExporter -Force -ErrorAction SilentlyContinue
-        Import-Module ".\MyExporter.psd1" -Force
+        $ModulePath = Join-Path $PSScriptRoot "MyExporter.psd1"
+        Import-Module $ModulePath -Force
         
         # Test 1.1: Parameter validation - REAL TEST
         $exportCmd = Get-Command Export-SystemInfo
@@ -200,12 +201,13 @@ if ($TestScenario -in @("All", "GuardRailsCompliance")) {
     
     # Test 3.1: Verify-Phase script existence and execution
     try {
-        if (Test-Path ".\Verify-Phase.ps1") {
+        $VerifyPhase = Join-Path $PSScriptRoot "Verify-Phase.ps1"
+        if (Test-Path $VerifyPhase) {
             # Test script execution with available parameters
-            & ".\Verify-Phase.ps1" -SkipCICheck
+            & $VerifyPhase -SkipCICheck
             Add-TestResult -TestName "Verify-Phase Execution" -Status "PASS" -Evidence "Verify-Phase script executed successfully"
         } else {
-            Add-TestResult -TestName "Verify-Phase Existence" -Status "FAIL" -Evidence "Verify-Phase.ps1 not found"
+            Add-TestResult -TestName "Verify-Phase Existence" -Status "FAIL" -Evidence "Verify-Phase.ps1 not found at $VerifyPhase"
         }
     } catch {
         Add-TestResult -TestName "Verify-Phase Execution" -Status "FAIL" -Evidence $_.Exception.Message
@@ -213,12 +215,14 @@ if ($TestScenario -in @("All", "GuardRailsCompliance")) {
     
     # Test 3.2: FileList accuracy validation
     try {
-        $manifest = Import-PowerShellDataFile ".\MyExporter.psd1"
+        $ManifestPath = Join-Path $PSScriptRoot "MyExporter.psd1"
+        $manifest = Import-PowerShellDataFile $ManifestPath
         $fileList = $manifest.FileList
         $missingFiles = @()
         
         foreach ($file in $fileList) {
-            if (-not (Test-Path $file)) {
+            $FullPath = Join-Path $PSScriptRoot $file
+            if (-not (Test-Path $FullPath)) {
                 $missingFiles += $file
             }
         }
@@ -234,10 +238,11 @@ if ($TestScenario -in @("All", "GuardRailsCompliance")) {
     
     # Test 3.3: CHANGELOG requirement
     try {
-        if (Test-Path "..\CHANGELOG.md") {
-            Add-TestResult -TestName "CHANGELOG Requirement" -Status "PASS" -Evidence "CHANGELOG.md found"
+        $ChangelogPath = Join-Path (Split-Path $PSScriptRoot) "docs\AssetRecords\CHANGELOG.md"
+        if (Test-Path $ChangelogPath) {
+            Add-TestResult -TestName "CHANGELOG Requirement" -Status "PASS" -Evidence "CHANGELOG.md found at $ChangelogPath"
         } else {
-            Add-TestResult -TestName "CHANGELOG Requirement" -Status "FAIL" -Evidence "CHANGELOG.md missing"
+            Add-TestResult -TestName "CHANGELOG Requirement" -Status "FAIL" -Evidence "CHANGELOG.md missing at $ChangelogPath"
         }
     } catch {
         Add-TestResult -TestName "CHANGELOG Check" -Status "FAIL" -Evidence $_.Exception.Message
