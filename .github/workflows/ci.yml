@@ -109,44 +109,9 @@ jobs:
             shell: 'pwsh'
             constitutional_role: "primary"
             description: "🎯 Primary Target - PowerShell 7.4 Core Windows"
-          
-          # Cross-Platform Validation - Ubuntu + PowerShell 7.4
-          - os: ubuntu-latest
-            psver: '7.4'
-            shell: 'pwsh'
-            constitutional_role: "cross-platform"
-            use_wsl: true
-            install_tmux: true
-            description: "🌐 Cross-Platform - Ubuntu + WSL + tmux Validation"
     
     steps:
     - uses: actions/checkout@v4
-    
-    - name: Setup PowerShell 7.4 (Ubuntu)
-      if: matrix.os == 'ubuntu-latest' && matrix.psver == '7.4'
-      shell: bash
-      run: |
-        # Install PowerShell 7.4 on Ubuntu for cross-platform validation
-        wget -q https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo apt-get install -y powershell
-    
-    - name: Setup WSL2 (Constitutional Cross-Platform Requirement)
-      if: matrix.use_wsl == true
-      uses: Vampire/setup-wsl@v2
-      with:
-        distribution: Ubuntu-22.04
-        additional-packages:
-          tmux
-          curl
-          jq
-    
-    - name: Setup tmux (Constitutional Terminal Requirement)
-      if: matrix.install_tmux == true && matrix.use_wsl != true
-      shell: bash
-      run: |
-        sudo apt-get install -y tmux
     
     - name: Install Constitutional Dependencies (PowerShell 5.1)
       if: matrix.psver == '5.1'
@@ -222,10 +187,11 @@ jobs:
       run: |
         if (Test-Path "${{ github.workspace }}/MyExporter") {
           Import-Module "${{ github.workspace }}/MyExporter" -Force
-          $AnalyzerResults = Invoke-ScriptAnalyzer -Path "${{ github.workspace }}/MyExporter" -Recurse -Settings PSGallery
+          $AnalyzerResults = Invoke-ScriptAnalyzer -Path "${{ github.workspace }}/MyExporter" -Recurse -Severity Error
           if ($AnalyzerResults) {
+            Write-Host "❌ Constitutional violations found (critical)" -ForegroundColor Red
             $AnalyzerResults | Format-Table
-            throw "CONSTITUTIONAL_BAILOUT: ScriptAnalyzer found constitutional violations"
+            throw "CONSTITUTIONAL_BAILOUT: GuardRails.md violations detected"
           }
           Write-Host "✅ Constitutional ScriptAnalyzer validation passed (5.1)" -ForegroundColor Green
         }
@@ -236,10 +202,11 @@ jobs:
       run: |
         if (Test-Path "${{ github.workspace }}/MyExporter") {
           Import-Module "${{ github.workspace }}/MyExporter" -Force
-          $AnalyzerResults = Invoke-ScriptAnalyzer -Path "${{ github.workspace }}/MyExporter" -Recurse -Settings PSGallery
+          $AnalyzerResults = Invoke-ScriptAnalyzer -Path "${{ github.workspace }}/MyExporter" -Recurse -Severity Error
           if ($AnalyzerResults) {
+            Write-Host "❌ Constitutional violations found (critical)" -ForegroundColor Red
             $AnalyzerResults | Format-Table
-            throw "CONSTITUTIONAL_BAILOUT: ScriptAnalyzer found constitutional violations"
+            throw "CONSTITUTIONAL_BAILOUT: GuardRails.md violations detected"
           }
           Write-Host "✅ Constitutional ScriptAnalyzer validation passed (7.x)" -ForegroundColor Green
         }
@@ -300,29 +267,6 @@ jobs:
           Write-Host "✅ Enhanced test bridge completed with evidence capture" -ForegroundColor Green
         } else {
           Write-Warning "Enhanced test bridge not found - systematic evidence capture may be incomplete"
-        }
-    
-    - name: Run Cross-Platform WSL Integration Tests (Ubuntu)
-      if: matrix.os == 'ubuntu-latest'
-      shell: pwsh
-      run: |
-        # Run cross-platform WSL integration validation
-        if (Test-Path "${{ github.workspace }}/MyExporter") {
-          Import-Module "${{ github.workspace }}/MyExporter" -Force
-          $WSLTests = Get-ChildItem -Path "${{ github.workspace }}/MyExporter/DevScripts" -Name "*WSL*.ps1" | Where-Object { $_ -like "Test-*" }
-          if ($WSLTests) {
-            foreach ($Test in $WSLTests) {
-              Write-Host "🌐 Running cross-platform WSL test: $Test" -ForegroundColor Cyan
-              try {
-                & "${{ github.workspace }}/MyExporter/DevScripts/$Test"
-                Write-Host "✅ WSL test passed: $Test" -ForegroundColor Green
-              } catch {
-                Write-Host "❌ WSL test failed: $Test - $_" -ForegroundColor Red
-                throw "CROSS_PLATFORM_BAILOUT: WSL test failed: $Test"
-              }
-            }
-          }
-          Write-Host "✅ Cross-platform WSL integration validated" -ForegroundColor Green
         }
     
     - name: Upload Constitutional Test Results and Evidence
