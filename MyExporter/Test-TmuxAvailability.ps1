@@ -48,8 +48,6 @@ function Test-TmuxAvailability {
         # Test 1: tmux command availability
         Write-Host "Step 1: Checking tmux installation..." -ForegroundColor Yellow
         
-        $tmuxCommand = if ($environment -eq "WSL2") { "wsl tmux" } else { "tmux" }
-        
         # Use & and command array to avoid Invoke-Expression
         if ($environment -eq "WSL2") {
             $versionOutput = & wsl tmux -V 2>$null

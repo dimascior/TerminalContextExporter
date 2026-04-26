@@ -1,5 +1,6 @@
 Describe "TmuxSessionReference Class Autoloading" {
     BeforeAll {
+        # PSScriptAnalyzer suppression: ModulePath used in It blocks via Import-Module
         $ModulePath = "$PSScriptRoot\..\MyExporter.psd1"
     }
     

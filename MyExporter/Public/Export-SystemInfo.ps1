@@ -98,7 +98,7 @@ function Export-SystemInfo {
                     # Re-hydrate function definitions in job context (GuardRails.md 11.3)
                     # PSScriptAnalyzer suppression: Necessary for job-safe function injection pattern
                     # $functionDefs sourced from Get-Content (trusted file read, not user input)
-                    # PSScriptAnalyzer ignore: PSAvoidUsingInvokeExpression
+                    #PSScriptAnalyzer -SuppressRuleViolation PSAvoidUsingInvokeExpression
                     Invoke-Expression $functionDefs
                     
                     try {
