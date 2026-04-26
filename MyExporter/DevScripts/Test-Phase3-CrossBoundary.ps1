@@ -19,9 +19,12 @@ Array of matrix leg configurations
 [CmdletBinding()]
 param()
 
+$CommitSHA = git rev-parse --short HEAD 2>$null
+if ([string]::IsNullOrEmpty($CommitSHA)) { $CommitSHA = "unknown" }
+
 $MatrixConfig = @{
     Timestamp = Get-Date -Format 'O'
-    CommitSHA = (git rev-parse --short HEAD 2>$null) ?? "unknown"
+    CommitSHA = $CommitSHA
     Legs = @(
         @{
             Name = "Windows-PS51-Desktop"
@@ -159,4 +162,9 @@ else {
 
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Yellow
 
-exit ($FailedLegs -eq 0 ? 0 : 1)
+if ($FailedLegs -eq 0) {
+    exit 0
+}
+else {
+    exit 1
+}

@@ -95,7 +95,19 @@ $Report.ConstitutionalVerification.Status = if ($MissingDocsCount -eq 0) { "PASS
 
 # 2. Aggregate evidence files from all matrix legs
 Write-Host "[EVIDENCE-AGGREGATION] Scanning for evidence files in $EvidencePath"
-$EvidenceFiles = Get-ChildItem -Path $EvidencePath -Filter "evidence-*.json" -ErrorAction SilentlyContinue
+
+# Collect all phase evidence files by pattern
+$Phase1Files = Get-ChildItem -Path $EvidencePath -Filter "constitutional-verification-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$Phase2Files = Get-ChildItem -Path $EvidencePath -Filter "anti-simulation-report-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$Phase3Files = Get-ChildItem -Path $EvidencePath -Filter "evidence-local-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+$Phase5Files = Get-ChildItem -Path $EvidencePath -Filter "security-scan-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+$EvidenceFiles = @()
+$EvidenceFiles += $Phase1Files
+$EvidenceFiles += $Phase2Files
+$EvidenceFiles += $Phase3Files
+$EvidenceFiles += $Phase5Files
+$EvidenceFiles = $EvidenceFiles | Where-Object { $null -ne $_ }
 
 if ($EvidenceFiles.Count -eq 0) {
     Write-Host "  ⚠ No evidence files found (establishing baseline mode)" -ForegroundColor Yellow
@@ -161,8 +173,11 @@ else {
 
 # 3. Check for anti-simulation enforcement
 Write-Host "[ANTI-SIMULATION-CHECK] Verifying real data usage..."
-if (Test-Path -Path "anti-simulation-report.json") {
-    $SimReport = Get-Content -Path "anti-simulation-report.json" | ConvertFrom-Json
+# Find latest anti-simulation report in evidence directory
+$AntiSimFiles = Get-ChildItem -Path $EvidencePath -Filter "anti-simulation-report-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+if ($AntiSimFiles) {
+    $SimReport = Get-Content -Path $AntiSimFiles.FullName | ConvertFrom-Json
     $Report.AntiSimulationEnforcement.AssertNoSimulatedTests = $SimReport.OverallStatus
     $SimStatus = if ($SimReport.OverallStatus -eq "PASS") { "ENFORCED" } else { "VIOLATION" }
     $Report.AntiSimulationEnforcement.Status = $SimStatus
