@@ -171,11 +171,7 @@ jobs:
         if: always()
         with:
           name: test-evidence-${{ matrix.os }}-${{ matrix.ps-version }}
-          path: |
-            MyExporter/**/*.json
-            MyExporter/**/*.csv
-            MyExporter/**/*-results.json
-            MyExporter/StateFiles/
+          path: MyExporter/.artifacts/evidence/local/
           retention-days: 7
 
   wsl-dedicated:

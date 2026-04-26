@@ -281,18 +281,14 @@ jobs:
         name: constitutional-test-results-${{ matrix.os }}-${{ matrix.psver }}
         path: |
           TestResults.xml
-          MyExporter/evidence-*.json
-          MyExporter/test-evidence-*.json
-          MyExporter/systematic-operation-evidence-*.json
+          MyExporter/.artifacts/evidence/local/*.json
     
     - name: Upload Evidence for Reproducibility Verification
       uses: actions/upload-artifact@v4
       if: matrix.os == 'windows-latest' && matrix.psver == '7.4'
       with:
         name: evidence-${{ github.sha }}-PS-7.4-Windows
-        path: |
-          MyExporter/evidence-*.json
-          MyExporter/test-evidence-*.json
+        path: MyExporter/.artifacts/evidence/local/*.json
         retention-days: 30
         compression-level: 6
 
