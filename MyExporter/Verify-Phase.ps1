@@ -251,6 +251,7 @@ function Test-FileList {
     # These should be excluded from "untracked files" violations since they
     # demonstrate test completion and pass verification gates
     $TestArtifactPatterns = @(
+        '\.artifacts[/\\].*\.json$', # Centralized evidence directory (all artifact files)
         'evidence-.*\.json$',        # Enhanced test bridge correlation evidence
         'test-evidence-.*\.json$',   # Test evidence output
         'test-output\.json$',        # Test output results

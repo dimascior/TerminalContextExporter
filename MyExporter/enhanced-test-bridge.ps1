@@ -205,7 +205,13 @@ if ($TestScenario -in @("All", "GuardRailsCompliance")) {
         if (Test-Path $VerifyPhase) {
             # Test script execution with available parameters
             & $VerifyPhase -SkipCICheck
-            Add-TestResult -TestName "Verify-Phase Execution" -Status "PASS" -Evidence "Verify-Phase script executed successfully"
+            $VerifyExitCode = $LASTEXITCODE
+            
+            if ($VerifyExitCode -eq 0) {
+                Add-TestResult -TestName "Verify-Phase Execution" -Status "PASS" -Evidence "Verify-Phase script executed successfully"
+            } else {
+                Add-TestResult -TestName "Verify-Phase Execution" -Status "FAIL" -Evidence "Verify-Phase failed with exit code $VerifyExitCode (GuardRails violations detected)"
+            }
         } else {
             Add-TestResult -TestName "Verify-Phase Existence" -Status "FAIL" -Evidence "Verify-Phase.ps1 not found at $VerifyPhase"
         }
@@ -258,6 +264,14 @@ $failedTests = $totalTests - $passedTests
 Write-Host "Total Tests: $totalTests" -ForegroundColor White
 Write-Host "Passed: $passedTests" -ForegroundColor Green
 Write-Host "Failed: $failedTests" -ForegroundColor Red
+
+# Add Summary for downstream consumers (Phase 3, etc.)
+$results | Add-Member -MemberType NoteProperty -Name "Summary" -Value @{
+    TotalTests = $totalTests
+    PassedTests = $passedTests
+    FailedTests = $failedTests
+    Overall = if ($failedTests -eq 0) { "PASS" } else { "FAIL" }
+} -Force
 
 # Evidence capture
 if ($CaptureEvidence) {

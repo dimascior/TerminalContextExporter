@@ -71,7 +71,7 @@ foreach ($Leg in $MatrixConfig.Legs) {
         $BridgePath = Join-Path $MyExporterRoot "enhanced-test-bridge.ps1"
         
         if (-not (Test-Path $BridgePath)) {
-            Write-Host "  ❌ enhanced-test-bridge.ps1 not found at $BridgePath" -ForegroundColor Red
+            Write-Host "  X Bridge not found at $BridgePath" -ForegroundColor Red
             $FailedLegs++
             $Results += @{
                 Leg = $Leg.Name
@@ -85,6 +85,19 @@ foreach ($Leg in $MatrixConfig.Legs) {
         # Execute test bridge
         Write-Host "  Executing: .$BridgePath"
         $Output = & $BridgePath -CaptureEvidence 2>&1
+        $BridgeExitCode = $LASTEXITCODE
+        
+        # Check bridge exit code first - if non-zero, bridge failed
+        if ($BridgeExitCode -ne 0) {
+            Write-Host "  X Bridge failed with exit code $BridgeExitCode (tests failed or GuardRails violations detected)" -ForegroundColor Red
+            $FailedLegs++
+            $Results += @{
+                Leg = $Leg.Name
+                Status = "FAIL"
+                Error = "Bridge failed with exit code $BridgeExitCode"
+            }
+            continue
+        }
         
         # Look for generated evidence file using absolute path
         $EvidencePath = Join-Path $MyExporterRoot ".artifacts/evidence/local"
@@ -92,10 +105,22 @@ foreach ($Leg in $MatrixConfig.Legs) {
         
         if ($EvidenceFiles) {
             $EvidenceFile = $EvidenceFiles.Name
-            $Evidence = Get-Content -Path $EvidenceFiles.FullName | ConvertFrom-Json
+            try {
+                $Evidence = Get-Content -Path $EvidenceFiles.FullName | ConvertFrom-Json
+            }
+            catch {
+                Write-Host "  X Failed to parse evidence JSON: $_" -ForegroundColor Red
+                $FailedLegs++
+                $Results += @{
+                    Leg = $Leg.Name
+                    Status = "FAIL"
+                    Error = "Evidence JSON parse error"
+                }
+                continue
+            }
             
             if ($Evidence.Summary.Overall -eq "PASS") {
-                Write-Host "  ✓ Tests PASSED" -ForegroundColor Green
+                Write-Host "  OK Tests PASSED" -ForegroundColor Green
                 Write-Host "    Evidence: $EvidenceFile" -ForegroundColor Green
                 $PassedLegs++
                 
@@ -109,8 +134,9 @@ foreach ($Leg in $MatrixConfig.Legs) {
                 }
             }
             else {
-                Write-Host "  ❌ Tests FAILED" -ForegroundColor Red
+                Write-Host "  X Tests FAILED" -ForegroundColor Red
                 Write-Host "    Evidence: $EvidenceFile" -ForegroundColor Red
+                Write-Host "    Overall: $($Evidence.Summary.Overall)" -ForegroundColor Red
                 $FailedLegs++
                 
                 $Results += @{
@@ -122,17 +148,17 @@ foreach ($Leg in $MatrixConfig.Legs) {
             }
         }
         else {
-            Write-Host "  ❌ No evidence file generated" -ForegroundColor Red
+            Write-Host "  X No evidence file generated" -ForegroundColor Red
             $FailedLegs++
             $Results += @{
                 Leg = $Leg.Name
                 Status = "FAIL"
-                Error = "Evidence not generated"
+                Error = "No evidence file generated"
             }
         }
     }
     catch {
-        Write-Host "  ❌ Exception: $_" -ForegroundColor Red
+        Write-Host "  X Exception: $_" -ForegroundColor Red
         $FailedLegs++
         $Results += @{
             Leg = $Leg.Name
@@ -145,25 +171,25 @@ foreach ($Leg in $MatrixConfig.Legs) {
 }
 
 # Summary
-Write-Host "═══════════════════════════════════════════" -ForegroundColor Yellow
+Write-Host "=========================================" -ForegroundColor Yellow
 Write-Host "MATRIX SUMMARY" -ForegroundColor Yellow
-Write-Host "═══════════════════════════════════════════" -ForegroundColor Yellow
+Write-Host "=========================================" -ForegroundColor Yellow
 Write-Host "  Legs Passed: $PassedLegs"
 Write-Host "  Legs Failed: $FailedLegs"
 Write-Host ""
 
-if ($FailedLegs -eq 0) {
-    Write-Host "✓ ALL MATRIX LEGS PASSED" -ForegroundColor Green
+if ($FailedLegs -eq 0 -and $PassedLegs -gt 0) {
+    Write-Host "OK ALL MATRIX LEGS PASSED" -ForegroundColor Green
     Write-Host "  Proceeding to Job 4: Constitutional Compliance Verification"
 }
 else {
-    Write-Host "❌ MATRIX FAILED" -ForegroundColor Red
+    Write-Host "X MATRIX FAILED" -ForegroundColor Red
     Write-Host "  Review failed leg evidence files for details"
 }
 
-Write-Host "═══════════════════════════════════════════" -ForegroundColor Yellow
+Write-Host "=========================================" -ForegroundColor Yellow
 
-if ($FailedLegs -eq 0) {
+if ($FailedLegs -eq 0 -and $PassedLegs -gt 0) {
     exit 0
 }
 else {
