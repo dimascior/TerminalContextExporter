@@ -29,8 +29,9 @@ $ErrorActionPreference = "Stop"
 # Evidence collection setup
 $evidenceTimestamp = Get-Date -Format "yyyy-MM-dd-HHmm"
 $correlationId = [guid]::NewGuid().ToString()
+# Capture full commit SHA for reproducibility verification
 $commitSha = if (Get-Command git -ErrorAction SilentlyContinue) { 
-    git rev-parse --short HEAD 2>$null 
+    git rev-parse HEAD 2>$null 
 } else { 
     "no-git" 
 }
@@ -255,7 +256,9 @@ Write-Host "Failed: $failedTests" -ForegroundColor Red
 
 # Evidence capture
 if ($CaptureEvidence) {
-    $evidenceFile = "evidence-$evidenceTimestamp.json"
+    $artifactDir = Join-Path $PSScriptRoot ".artifacts\evidence\local"
+    if (-not (Test-Path $artifactDir)) { New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null }
+    $evidenceFile = Join-Path $artifactDir "evidence-local-$evidenceTimestamp.json"
     $results | ConvertTo-Json -Depth 5 | Out-File $evidenceFile -Encoding UTF8
     Write-Host "`nEvidence captured: $evidenceFile" -ForegroundColor Yellow
     Write-Host "Commit SHA: $commitSha" -ForegroundColor Gray

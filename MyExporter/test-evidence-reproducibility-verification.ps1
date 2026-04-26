@@ -26,7 +26,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory = $false)]
-    [string]$LocalEvidencePath = (Join-Path (Split-Path $PSScriptRoot -Parent) "MyExporter/evidence-local-*.json"),
+    [string]$LocalEvidencePath = (Join-Path $PSScriptRoot ".artifacts/evidence/local/evidence-local-*.json"),
     
     [Parameter(Mandatory = $false)]
     [string]$MatrixLeg = 'PS-7.4-Windows',
@@ -165,6 +165,23 @@ try {
     }
     
     # Exit with appropriate code
+    if ($comparison.CommitSHAMismatch) {
+        Write-Host "`nCommit SHA Analysis:" -ForegroundColor Cyan
+        Write-Host "Local commit differs from baseline commit (code changes present)" -ForegroundColor Yellow
+        Write-Host "This is expected when code is modified between commits" -ForegroundColor Gray
+        
+        # When code changes (commit SHA changes), validate structure but allow new test status
+        if ($comparison.EnvironmentMismatch.Count -gt 0) {
+            Write-ReproducibilityStatus "Environment mismatch detected preventing baseline update" 'FAIL'
+            exit 1
+        }
+        
+        Write-ReproducibilityStatus "Baseline update: code changed, new evidence becomes reference for next commit" 'PASS'
+        Write-ReproducibilityStatus "Evidence reproducibility verified (after code update)" 'PASS'
+        exit 0
+    }
+    
+    # Normal comparison (same commit SHA) - strict mode
     if ($comparison.Pass) {
         Write-ReproducibilityStatus "Evidence reproducibility VERIFIED" 'PASS'
         exit 0

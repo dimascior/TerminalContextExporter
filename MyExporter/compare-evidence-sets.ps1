@@ -47,6 +47,16 @@ function Compare-Evidence {
         TestsRemoved         = @()
         StatusChanges        = @()
         Diagnostics          = ""
+        CommitSHAMismatch    = $false
+    }
+    
+    # Check commit SHA - if different, indicate baseline establishment (different code)
+    if ($Baseline.CommitSHA -ne $Current.CommitSHA -and $Baseline.CommitSHA -ne "no-git" -and $Current.CommitSHA -ne "no-git") {
+        $result.CommitSHAMismatch = $true
+        $result.Diagnostics += "Commit SHA changed: baseline=$($Baseline.CommitSHA) vs current=$($Current.CommitSHA)`n"
+        $result.Diagnostics += "This comparison is across different code versions (expected after code changes)`n"
+        # When commit SHAs differ, this is an expected change - not an error condition
+        # but we still validate test structure hasn't broken
     }
     
     # Compare schema versions

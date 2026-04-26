@@ -184,24 +184,55 @@ On push to main or dev, two GitHub Actions workflows fire in sequence.
 - Test-Phase5-Functionality runs real tmux session management tests
 - No simulation allowed: all terminal operations use actual tmux/wsl binaries
 
-### Step 6: Evidence Collection
+### Step 6: Evidence Collection & Organization
 
-Every test run produces JSON evidence files uploaded as artifacts:
+Every test run produces JSON evidence files organized in `.artifacts/` structure:
 
-| Evidence Type | Purpose | Retention |
-|---------------|---------|-----------|
-| evidence-*.json | Operation metadata with correlation IDs, commit SHAs, timestamps | 30 days |
-| test-evidence-*.json | Enhanced test bridge results with system context | 30 days |
-| compliance-*.json | Per-matrix compliance reports aggregated across platforms | 30 days |
-| constitutional-verification-evidence.json | Local constitutional validation log | Build artifact |
+**Directory Organization:**
+```
+MyExporter/.artifacts/
+├── evidence/
+│   ├── local/           # Local development evidence (excluded from VCS)
+│   │   └── evidence-local-[timestamp].json
+│   └── baseline/        # GitHub Actions baseline evidence
+│       └── evidence-baseline-[leg]-[commit].json
+└── test-results/        # Test execution details (excluded from VCS)
+    └── test-evidence-[timestamp].json
+```
 
-The enhanced-test-bridge.ps1 generates these during execution (L38-50):
-- Commit SHA
-- PowerShell version
-- Operating system
-- Correlation ID
-- Per-test pass/fail status
+**Evidence Types & Retention Policy:**
+
+| Evidence Type | Location | Purpose | Retention | Tracked |
+|---------------|----------|---------|-----------|---------|
+| evidence-local-*.json | `.artifacts/evidence/local/` | Local test evidence with correlation IDs, commit SHAs, timestamps | 365 days (1 year local retention) | No (.gitignore) |
+| evidence-baseline-*.json | `.artifacts/evidence/baseline/` | GitHub Actions baseline for reproducibility comparison | Indefinite | No (.gitignore) |
+| test-evidence-*.json | `.artifacts/test-results/` | Enhanced test bridge results with system context | 365 days (1 year local retention) | No (.gitignore) |
+
+**Evidence Generation Process:**
+
+The `enhanced-test-bridge.ps1` script generates evidence during execution:
+- Captures full commit SHA (40-character hash)
+- PowerShell version and edition (5.1/7.x, Desktop/Core)
+- Operating system detection (Windows/Linux/macOS)
+- Correlation ID (GUID for end-to-end tracing)
+- Per-test pass/fail status with real system data
 - Evidence strings like "JSON file created: output.json (390 bytes), Computer: DESKTOP-T3NJDBQ"
+
+**Reproducibility Workflow:**
+
+1. **Local Development:** Developer runs `enhanced-test-bridge.ps1 -CaptureEvidence`
+   - Generates `evidence-local-[timestamp].json` in `.artifacts/evidence/local/`
+   - Contains current commit SHA and test results
+
+2. **CI/CD Pipeline:** GitHub Actions also generates evidence for PS 7.4 Windows matrix leg
+   - Stored as GitHub Actions artifact
+   - Retrieved by reproducibility verification script
+
+3. **Verification:** `test-evidence-reproducibility-verification.ps1` compares:
+   - Local evidence vs. GitHub Actions baseline
+   - Handles first commit (baseline establishment)
+   - Recognizes code changes (SHA mismatch = expected)
+   - Blocks environment mismatches (reproducibility violation)
 
 ### Step 7: Pull Request to main
 
@@ -210,7 +241,8 @@ PR triggers the same full CI pipeline on the PR head. Merge requires:
 - Commit message carries correct "Level N:" declaration
 - No unresolved -Pending Pester tests
 - CHANGELOG.md updated within 7 days
-- All evidence artifacts present and non-empty
+- Evidence artifacts present and non-empty
+- Reproducibility verification passes (or baseline establishment)
 
 ---
 
@@ -1184,7 +1216,7 @@ Human reviewer knows:
 - Evidence exists with real data (not simulation)
 - All tests passed across 3 platform matrix legs
 - CorrelationId enables end-to-end tracing
-- 30-day artifact retention for root cause analysis
+- 1-year artifact retention for root cause analysis
 
 ```
 Review Checklist:
@@ -1482,7 +1514,7 @@ git merge --squash feature/network-interface
 # 3. Post-merge validation: CI runs again on main
 # Ensures merged state is valid
 
-# 4. Artifact retention: evidence-*.json artifacts kept for 30 days
+# 4. Artifact retention: evidence-*.json artifacts kept for 365 days (1 year)
 # Enables root cause analysis if issues arise post-merge
 ```
 
@@ -1620,36 +1652,67 @@ WorkflowDynamics/                    # Master Framework Implementation
 │       ├── MCD.md                   # Model-Centric Design patterns & anti-over-engineering
 │       └── GuardRail.md             # Additional guardrail patterns
 └── MyExporter/                      #  REFERENCE IMPLEMENTATION MODULE
-    ├── MyExporter.psd1              # Constitutional Layer - Immutable contracts
-    ├── MyExporter.psm1              # Architectural Layer - Module orchestration
-    ├── Classes/                     # Data Contract Layer
-    │   └── SystemInfo.ps1           # PowerShell class with strict mode compatibility
-    ├── Private/                     # Implementation Layer - Internal functions
+    ├── MyExporter.psd1              # Constitutional Layer - Immutable contracts (manifest)
+    ├── MyExporter.psm1              # Architectural Layer - Module orchestration root
+    ├── .artifacts/                  # Build artifacts and evidence (excluded from VCS .gitignore)
+    │   ├── evidence/
+    │   │   ├── local/               # Local development evidence
+    │   │   │   └── evidence-local-*.json
+    │   │   └── baseline/            # GitHub Actions baseline evidence (historical archive)
+    │   │       ├── evidence-2025-07-06-2319.json
+    │   │       ├── evidence-2025-07-06-2322.json
+    │   │       ├── evidence-2025-07-06-2325.json
+    │   │       ├── evidence-2025-07-06-2326.json
+    │   │       └── evidence-2025-07-06-2327.json
+    │   └── test-results/            # Test execution artifacts
+    │       ├── evidence-local-*.json # Historical local evidence
+    │       ├── test-evidence-*.json  # Test output files
+    │       └── test-output.json
+    ├── Classes/                     # Data Contract Layer (strong typing)
+    │   ├── SystemInfo.ps1           # PowerShell 5.1 compatible class
+    │   └── TmuxSessionReference.ps1 # Immutable tmux session state class
+    ├── Private/                     # Implementation Layer - Internal functions (30 files)
     │   ├── _Initialize.ps1          # Context establishment ($script scope)
-    │   ├── Assert-ContextPath.ps1   # Path validation (GuardRails compliance)
+    │   ├── Add-TerminalContextToSystemInfo.ps1 # Helper for terminal data enrichment
+    │   ├── Assert-ContextPath.ps1   # Cross-platform path validation
     │   ├── Assert-ContextualPath.ps1 # Legacy function (superseded)
+    │   ├── Get-CurrentSession.ps1   # Current execution session detection
     │   ├── Get-ExecutionContext.ps1 # Environmental context discovery
-    │   ├── Get-SystemInfo.Windows.ps1 # Windows-specific implementation
-    │   ├── Get-SystemInfo.Linux.ps1   # Linux-specific implementation
-    │   ├── Get-SystemInfoPlatformSpecific.ps1 # Platform dispatcher
-    │   └── Invoke-WithTelemetry.ps1 # Telemetry wrapper with correlation IDs
-    ├── Public/                      # Public API Layer
-    │   └── Export-SystemInfo.ps1    # Main cmdlet with job-safe execution
-    ├── Test-*.ps1                   # Testing & Validation Suite
-    │   ├── Test-MyExporter.ps1      # Core functionality tests
-    │   ├── Test-ModuleLoading.ps1   # Module loading validation
-    │   ├── Test-JobFunctionality.ps1 # Background job testing
-    │   ├── Test-PowerShell51Compatibility.ps1 # Cross-edition validation
-    │   └── test_claude_analysis.ps1 # AI collaboration testing
-    ├── claude-*.sh/bat              #  EXECUTION BRIDGE INFRASTRUCTURE
-    │   ├── claude-powershell-bridge.bat # WSL→Windows PowerShell execution
-    │   ├── claude-wsl-launcher.sh   # Cross-platform orchestration
-    │   └── claude-direct-test.sh    # Direct command execution
-    └── final-test-*.csv/json        # TasksV3 completion evidence files
-        ├── final-test-fastpath.csv  # FastPath CSV validation (226 bytes)
-        ├── final-test-fastpath.json # FastPath JSON validation (288 bytes)
-        ├── final-test-normal.csv    # Normal mode CSV validation (306 bytes)
-        └── final-test-normal.json   # Normal mode JSON validation (390 bytes)
+    │   ├── Get-SystemInfo.Windows.ps1 # Windows-specific system info
+    │   ├── Get-SystemInfo.Linux.ps1 # Linux-specific system info
+    │   ├── Get-SystemInfoPlatformSpecific.ps1 # Platform router/dispatcher
+    │   ├── Get-TerminalContext.WSL.ps1 # WSL terminal capability detection
+    │   ├── Get-TerminalContextPlatformSpecific.ps1 # Terminal capability router
+    │   ├── Get-TerminalOutput.WSL.ps1 # WSL terminal output capture
+    │   ├── Invoke-WithTelemetry.ps1 # Correlation ID threading wrapper
+    │   ├── Invoke-WslTmuxCommand.ps1 # WSL tmux integration
+    │   ├── New-TmuxArgumentList.ps1 # Tmux argument builder
+    │   ├── TerminalTelemetryBatcher.ps1 # Telemetry event batching
+    │   ├── Test-CommandSafety.ps1   # Command safety validation
+    │   ├── Test-TerminalCapabilities.ps1 # Terminal capability probing
+    │   └── Update-StateFileSchema.ps1 # Schema migration for state files
+    ├── Public/                      # Public API Layer - single entry point
+    │   └── Export-SystemInfo.ps1    # Main cmdlet (FastPath + job-safe execution)
+    ├── Policies/                    # Security policy definitions
+    │   ├── terminal.deny.yml        # Terminal access deny policy
+    │   └── terminal-deny.yaml       # Terminal access deny policy (alt format)
+    ├── Tests/                       # Pester test suite (7 test files)
+    │   ├── ClassAvailability.Tests.ps1 # Class loading validation
+    │   ├── ClassLoading.Tests.ps1   # PowerShell 5.1 class compatibility
+    │   ├── Export-SystemInfo.Tests.ps1 # Public API functional tests
+    │   ├── Initialize-WSLUser.bats  # Bash Automated Testing Suite
+    │   ├── TelemetryCompliance.Tests.ps1 # Correlation ID threading
+    │   ├── Test-TmuxArgumentList.ps1 # Tmux argument builder tests
+    │   └── TmuxSessionReference.Tests.ps1 # Immutable pattern validation
+    ├── compare-evidence-sets.ps1    # Evidence comparison (SHA mismatch handling)
+    ├── download-actions-evidence.ps1 # GitHub Actions artifact download
+    ├── enhanced-test-bridge.ps1     # Evidence generation with real tests
+    ├── Initialize-WSLUser.sh        # WSL user initialization script
+    ├── normalize-evidence-for-comparison.ps1 # Evidence normalization
+    ├── test-evidence-analysis.ps1   # Evidence interpretation framework
+    ├── test-evidence-reproducibility-verification.ps1 # Reproducibility gate (local vs. Actions)
+    ├── Test-TmuxAvailability.ps1    # Tmux capability verification
+    └── Verify-Phase.ps1             # Pre-commit validation (8 gates)
 ```
 
 ---

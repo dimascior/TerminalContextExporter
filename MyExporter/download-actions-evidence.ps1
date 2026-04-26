@@ -72,7 +72,7 @@ function Get-ActionsEvidence {
     }
     
     # Check for repository-stored baseline first (for expired artifacts)
-    $baselineDir = Join-Path (Split-Path $OutDir -Parent) "baselines"
+    $baselineDir = Join-Path (Split-Path (Split-Path $OutDir -Parent) -Parent) ".artifacts\evidence\baseline"
     $storedBaseline = Join-Path $baselineDir "evidence-baseline-${Leg}-${Sha}.json"
     
     if (Test-Path $storedBaseline) {

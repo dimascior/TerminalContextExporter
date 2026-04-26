@@ -358,10 +358,13 @@ function Catalog-EvidenceFiles {
     }
     
     # Discover evidence files (excluded from untracked file gate)
+    $EvidenceDir = Join-Path $PSScriptRoot ".artifacts\evidence\local"
     $EvidenceFiles = @()
-    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'evidence-*.json' -ErrorAction SilentlyContinue
-    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'test-evidence-*.json' -ErrorAction SilentlyContinue
-    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'test-output.json' -ErrorAction SilentlyContinue
+    
+    if (Test-Path $EvidenceDir) {
+        $EvidenceFiles += Get-ChildItem "$EvidenceDir" -Filter 'evidence-*.json' -ErrorAction SilentlyContinue
+        $EvidenceFiles += Get-ChildItem "$EvidenceDir" -Filter 'test-evidence-*.json' -ErrorAction SilentlyContinue
+    }
     
     if ($EvidenceFiles.Count -gt 0) {
         Write-PhaseStatus "Evidence files indexed for audit trail: $($EvidenceFiles.Count) file(s)" 'INFO'
@@ -410,8 +413,21 @@ function Test-EvidenceReproducibility {
     }
     
     try {
+        # Get commit SHA from environment or git
+        $commitSHA = $env:GITHUB_SHA
+        if (-not $commitSHA) {
+            # Local execution - get SHA from git
+            if (Get-Command git -ErrorAction SilentlyContinue) {
+                $commitSHA = & git rev-parse HEAD 2>$null
+            }
+        }
+        
         # Run reproducibility verification in isolated scope
-        $reproducibilityResult = & $reproducibilityScript
+        if ($commitSHA) {
+            $reproducibilityResult = & $reproducibilityScript -CommitSHA $commitSHA
+        } else {
+            $reproducibilityResult = & $reproducibilityScript
+        }
         
         # If the script exits non-zero, it will throw; if zero (pass), we continue
         Write-PhaseStatus "Evidence reproducibility verified" 'PASS'
