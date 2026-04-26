@@ -86,8 +86,9 @@ foreach ($Leg in $MatrixConfig.Legs) {
         Write-Host "  Executing: .$BridgePath"
         $Output = & $BridgePath -CaptureEvidence 2>&1
         
-        # Look for generated evidence file
-        $EvidenceFiles = Get-ChildItem -Path ".artifacts/evidence/local" -Filter "evidence-local-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        # Look for generated evidence file using absolute path
+        $EvidencePath = Join-Path $MyExporterRoot ".artifacts/evidence/local"
+        $EvidenceFiles = Get-ChildItem -Path $EvidencePath -Filter "evidence-local-*.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
         
         if ($EvidenceFiles) {
             $EvidenceFile = $EvidenceFiles.Name
@@ -95,7 +96,7 @@ foreach ($Leg in $MatrixConfig.Legs) {
             
             if ($Evidence.Summary.Overall -eq "PASS") {
                 Write-Host "  ✓ Tests PASSED" -ForegroundColor Green
-                Write-Host "    Evidence: $EvidenceFile ($($EvidenceFiles.Length) bytes)" -ForegroundColor Green
+                Write-Host "    Evidence: $EvidenceFile" -ForegroundColor Green
                 $PassedLegs++
                 
                 $Results += @{

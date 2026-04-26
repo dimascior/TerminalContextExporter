@@ -118,11 +118,12 @@ else {
     $Report.AggregatedSummary.TotalMatrixLegs = $EvidenceFiles.Count
     
     foreach ($EvidenceFile in $EvidenceFiles) {
-        Write-Host "    Processing: $($EvidenceFile.Name) ($($EvidenceFile.Length) bytes)" -ForegroundColor Cyan
+        Write-Host "    Processing: $($EvidenceFile.Name)" -ForegroundColor Cyan
         
         # Validate file size (> 100 bytes ensures real data, not empty)
         if ($EvidenceFile.Length -lt 100) {
-            Write-Host "      ❌ File too small: $($EvidenceFile.Length) bytes (requires > 100)" -ForegroundColor Red
+            $Size = $EvidenceFile.Length
+            Write-Host "      ❌ File too small: $Size bytes (requires > 100)" -ForegroundColor Red
             $Report.AggregatedSummary.TotalFailed++
             continue
         }
@@ -224,7 +225,7 @@ Write-Host "  Constitutional Docs: $($Report.ConstitutionalVerification.Status)"
 Write-Host "  Matrix Legs: $($Report.AggregatedSummary.LegsWithPassStatus)/$($Report.AggregatedSummary.TotalMatrixLegs) PASS"
 Write-Host "  Simulation Detected: $(-not $Report.AggregatedSummary.NoSimulationDetected)"
 Write-Host "  CHANGELOG Updated: $($Report.AggregatedSummary.ChangelogUpdated)"
-$ReadyText = if ($Report.AggregatedSummary.Ready) { "YES ✓" } else { "NO ❌" }
+$ReadyText = if ($Report.AggregatedSummary.Ready) { "YES [OK]" } else { "NO [FAIL]" }
 Write-Host "  ==> Ready for Merge: $ReadyText"
 Write-Host "═══════════════════════════════════════════" -ForegroundColor Yellow
 

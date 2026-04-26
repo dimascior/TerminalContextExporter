@@ -1,0 +1,80 @@
+﻿{
+    "DocumentsRequired":  [
+                              {
+                                  "Section":  "Parts 1-3 (Boundaries)",
+                                  "Path":  "integration loop/GuardRails.md"
+                              },
+                              {
+                                  "Section":  "Full-Spectrum Unity",
+                                  "Path":  "MASTER-CONTEXT-FRAMEWORK.md"
+                              },
+                              {
+                                  "Section":  "Parts 4-7 (Collaboration)",
+                                  "Path":  "integration loop/CLAUDE.md"
+                              },
+                              {
+                                  "Section":  "Execution Discipline",
+                                  "Path":  "TaskLoop/Isolate-Trace-Verify-Loop.md"
+                              },
+                              {
+                                  "Section":  "Current State",
+                                  "Path":  "AssetRecords/Implementation-Status.md"
+                              },
+                              {
+                                  "Section":  "Progressive Anchoring",
+                                  "Path":  "ThreeTierWorkflow.md"
+                              }
+                          ],
+    "ValidationResults":  [
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "integration loop/GuardRails.md",
+                                  "FileSize":  40846,
+                                  "Section":  "Parts 1-3 (Boundaries)"
+                              },
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "MASTER-CONTEXT-FRAMEWORK.md",
+                                  "FileSize":  16269,
+                                  "Section":  "Full-Spectrum Unity"
+                              },
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "integration loop/CLAUDE.md",
+                                  "FileSize":  15272,
+                                  "Section":  "Parts 4-7 (Collaboration)"
+                              },
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "TaskLoop/Isolate-Trace-Verify-Loop.md",
+                                  "FileSize":  65284,
+                                  "Section":  "Execution Discipline"
+                              },
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "AssetRecords/Implementation-Status.md",
+                                  "FileSize":  54094,
+                                  "Section":  "Current State"
+                              },
+                              {
+                                  "Status":  "FOUND",
+                                  "Document":  "ThreeTierWorkflow.md",
+                                  "FileSize":  5407,
+                                  "Section":  "Progressive Anchoring"
+                              }
+                          ],
+    "Timestamp":  "2026-04-26T13:15:11.8776949-04:00",
+    "CommitSHA":  "1084614",
+    "TestSuite":  "Phase1-Constitutional-Verification",
+    "CrossDocumentReferences":  [
+
+                                ],
+    "Summary":  {
+                    "DocumentsFound":  6,
+                    "BailoutTriggered":  false,
+                    "DocumentsMissing":  0,
+                    "AllDocumentsPresent":  true,
+                    "TotalDocuments":  6
+                },
+    "CorrelationId":  "4fa3e5f1-1a37-4084-80de-85875aba6850"
+}

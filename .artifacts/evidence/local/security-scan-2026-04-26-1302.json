@@ -1,0 +1,77 @@
+﻿{
+    "Checks":  [
+                   {
+                       "ItemsFound":  3,
+                       "Status":  "FLAGGED",
+                       "Check":  "Hardcoded Credentials"
+                   },
+                   {
+                       "ItemsFound":  6,
+                       "Status":  "FLAGGED",
+                       "Check":  "Dangerous Functions"
+                   },
+                   {
+                       "ItemsFound":  2,
+                       "Status":  "FLAGGED",
+                       "Check":  "Version Compatibility"
+                   },
+                   {
+                       "Status":  "SKIPPED",
+                       "Reason":  "Not installed",
+                       "Check":  "Trivy"
+                   }
+               ],
+    "Vulnerabilities":  [
+                            {
+                                "Pattern":  "password\\s*=\\s*.",
+                                "File":  "Test-Phase5-Security.ps1",
+                                "Line":  1
+                            },
+                            {
+                                "Pattern":  "api.?key\\s*=\\s*.",
+                                "File":  "Test-Phase5-Security.ps1",
+                                "Line":  1
+                            },
+                            {
+                                "Pattern":  "SecureString\\s*.",
+                                "File":  "Test-Phase5-Security.ps1",
+                                "Line":  1
+                            },
+                            {
+                                "Function":  "Invoke-Expression",
+                                "File":  "Test-Phase5-Security.ps1"
+                            },
+                            {
+                                "Function":  "DownloadString",
+                                "File":  "Test-Phase5-Security.ps1"
+                            },
+                            {
+                                "Function":  "DownloadFile.*\\$",
+                                "File":  "Test-Phase5-Security.ps1"
+                            },
+                            {
+                                "Function":  "Get-Content.*-Raw.*\\|.*Invoke",
+                                "File":  "Test-Phase5-Security.ps1"
+                            },
+                            {
+                                "Function":  "Invoke-Expression",
+                                "File":  "Export-SystemInfo.ps1"
+                            },
+                            {
+                                "Function":  "Invoke-Expression",
+                                "File":  "Test-TmuxAvailability.ps1"
+                            },
+                            {
+                                "Issue":  "PowerShell 7+ only operators detected",
+                                "File":  "Test-Phase5-Security.ps1"
+                            },
+                            {
+                                "Issue":  "PowerShell 7+ only operators detected",
+                                "File":  "normalize-evidence-for-comparison.ps1"
+                            }
+                        ],
+    "CommitSHA":  "b045392",
+    "Timestamp":  "2026-04-26T13:02:55.0960103-04:00",
+    "Status":  "FLAGGED",
+    "CorrelationId":  "04d276ec-a707-49b3-b0ce-d51abe4b7141"
+}
