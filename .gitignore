@@ -11,6 +11,8 @@ claude-*-test.sh
 # Test evidence and artifacts (generated during local testing, not tracked)
 # Evidence files are compared against GitHub Actions baselines, not committed
 MyExporter/.artifacts/
+test-evidence-*.json
+test-output.json
 
 # Temporary files
 *.tmp

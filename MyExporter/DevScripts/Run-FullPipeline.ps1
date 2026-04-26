@@ -169,12 +169,13 @@ Write-Host ("Total Duration: " + $Total + " seconds")
 Write-Host ""
 Write-Host "[SUCCESS] All gates PASSED - READY FOR MERGE" -ForegroundColor Green
 Write-Host ""
-Write-Host "Evidence files generated:"
-Write-Host "  - constitutional-verification-evidence.json (Phase 1)"
-Write-Host "  - anti-simulation-report.json (Phase 2)"
-Write-Host "  - .artifacts/evidence/local/evidence-*.json (Phase 3)"
+Write-Host "Evidence files generated (centralized in .artifacts/evidence/local/):"
+Write-Host "  - constitutional-verification-TIMESTAMP.json (Phase 1)"
+Write-Host "  - anti-simulation-report-TIMESTAMP.json (Phase 2)"
+Write-Host "  - evidence-local-TIMESTAMP.json (Phase 3)"
+Write-Host "  - test-evidence-TIMESTAMP.json (Phase 3 bridge)"
 Write-Host "  - compliance-final.json (Phase 4)"
-Write-Host "  - security-scan-results.json (Phase 5)"
+Write-Host "  - security-scan-TIMESTAMP.json (Phase 5)"
 Write-Host ""
 
 exit 0

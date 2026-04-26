@@ -117,7 +117,11 @@ if ($TestScenario -in @("All", "BasicFunctionality")) {
         
         # Test 1.3: Real function execution with file creation verification
         try {
-            $testOutputFile = "test-evidence-$evidenceTimestamp.json"
+            # Ensure artifacts directory exists
+            $artifactDir = Join-Path $PSScriptRoot ".artifacts/evidence/local"
+            if (-not (Test-Path $artifactDir)) { New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null }
+            
+            $testOutputFile = Join-Path $artifactDir "test-evidence-$evidenceTimestamp.json"
             
             # Execute function and check for file creation
             Export-SystemInfo -ComputerName "localhost" -OutputPath $testOutputFile -Format "JSON" -ErrorAction Stop
