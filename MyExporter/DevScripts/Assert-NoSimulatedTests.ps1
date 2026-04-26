@@ -85,8 +85,18 @@ else {
 }
 
 # Output report
-$Report | ConvertTo-Json -Depth 10 | Out-File -FilePath "anti-simulation-report.json" -Encoding UTF8
-Write-Host "[REPORT] Written to anti-simulation-report.json"
+# Ensure artifacts directory exists
+$EvidenceDir = ".artifacts/evidence/local"
+if (-not (Test-Path $EvidenceDir)) {
+    New-Item -ItemType Directory -Path $EvidenceDir -Force | Out-Null
+}
+
+# Generate timestamp-based filename
+$Timestamp = Get-Date -Format 'yyyy-MM-dd-HHmm'
+$ReportFile = Join-Path $EvidenceDir "anti-simulation-report-$Timestamp.json"
+
+$Report | ConvertTo-Json -Depth 10 | Out-File -FilePath $ReportFile -Encoding UTF8
+Write-Host "[REPORT] Written to $ReportFile"
 
 # Display results
 if ($Report.OverallStatus -eq "FAIL") {

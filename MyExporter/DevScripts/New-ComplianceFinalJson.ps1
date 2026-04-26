@@ -22,7 +22,7 @@ Output file for compliance-final.json
 [CmdletBinding()]
 param(
     [string]$EvidencePath = ".artifacts/evidence/local",
-    [string]$OutputFile = "compliance-final.json"
+    [string]$OutputFile = ".artifacts/evidence/local/compliance-final.json"
 )
 
 $GitSHA = git rev-parse --short HEAD 2>$null

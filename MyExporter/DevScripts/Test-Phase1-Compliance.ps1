@@ -112,10 +112,25 @@ else {
 }
 
 Write-Host "===============================================" -ForegroundColor Yellow
+
+# Ensure artifacts directory exists
+$EvidenceDir = ".artifacts/evidence/local"
+if (-not (Test-Path $EvidenceDir)) {
+    New-Item -ItemType Directory -Path $EvidenceDir -Force | Out-Null
+}
+
+# Generate correlation ID
+$CorrelationId = [guid]::NewGuid().ToString()
+$Evidence | Add-Member -MemberType NoteProperty -Name "CorrelationId" -Value $CorrelationId
+
+# Generate timestamp-based filename
+$Timestamp = Get-Date -Format 'yyyy-MM-dd-HHmm'
+$EvidenceFile = Join-Path $EvidenceDir "constitutional-verification-$Timestamp.json"
+
 # Output evidence
-$Evidence | ConvertTo-Json -Depth 10 | Out-File -FilePath "constitutional-verification-evidence.json" -Encoding UTF8
+$Evidence | ConvertTo-Json -Depth 10 | Out-File -FilePath $EvidenceFile -Encoding UTF8
 Write-Host ""
-Write-Host "[EVIDENCE] Written to constitutional-verification-evidence.json"
+Write-Host "[EVIDENCE] Written to $EvidenceFile"
 
 $ExitCode = if ($Evidence.Summary.AllDocumentsPresent) { 0 } else { 1 }
 exit $ExitCode

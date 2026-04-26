@@ -62,7 +62,10 @@ foreach ($Leg in $MatrixConfig.Legs) {
     
     try {
         # Run enhanced-test-bridge for this leg
-        $BridgePath = Join-Path (Get-Location) "enhanced-test-bridge.ps1"
+        # Script is in MyExporter/DevScripts, so bridge is at MyExporter/enhanced-test-bridge.ps1
+        $DevScriptsDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+        $MyExporterRoot = Split-Path -Parent $DevScriptsDir
+        $BridgePath = Join-Path $MyExporterRoot "enhanced-test-bridge.ps1"
         
         if (-not (Test-Path $BridgePath)) {
             Write-Host "  ❌ enhanced-test-bridge.ps1 not found at $BridgePath" -ForegroundColor Red
