@@ -227,12 +227,36 @@ function Test-FileList {
     
     $Issues = @()
     
-    # Check that all new files are tracked
+    # Test artifacts that are byproducts of test execution (sequential evidence)
+    # These should be excluded from "untracked files" violations since they
+    # demonstrate test completion and pass verification gates
+    $TestArtifactPatterns = @(
+        'evidence-.*\.json$',        # Enhanced test bridge correlation evidence
+        'test-evidence-.*\.json$',   # Test evidence output
+        'test-output\.json$',        # Test output results
+        'TestResults\.xml$'          # Pester XML test results
+    )
+    
+    # Check that all new files are tracked (excluding test artifacts)
     $GitStatus = git status --porcelain 2>$null
     if ($GitStatus) {
         $UntrackedFiles = $GitStatus | Where-Object { $_ -match '^\?\?' }
         if ($UntrackedFiles) {
-            $Issues += "Untracked files found: $($UntrackedFiles -join ', ')"
+            # Filter out legitimate test artifacts generated during test execution
+            $TrackedCodeViolations = $UntrackedFiles | Where-Object {
+                $filePath = $_ -replace '^\?\?\s+', ''
+                $isTestArtifact = $false
+                foreach ($pattern in $TestArtifactPatterns) {
+                    if ($filePath -match $pattern) {
+                        $isTestArtifact = $true
+                        break
+                    }
+                }
+                -not $isTestArtifact
+            }
+            if ($TrackedCodeViolations) {
+                $Issues += "Untracked code files found: $($TrackedCodeViolations -join ', ') (test artifacts excluded by policy)"
+            }
         }
     }
     
@@ -323,6 +347,51 @@ function Test-PendingSpecs {
     return $Issues
 }
 
+function Catalog-EvidenceFiles {
+    [CmdletBinding()]
+    param()
+    
+    $Evidence = @{
+        Found       = @()
+        CorrelationIds = @()
+        Information = ""
+    }
+    
+    # Discover evidence files (excluded from untracked file gate)
+    $EvidenceFiles = @()
+    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'evidence-*.json' -ErrorAction SilentlyContinue
+    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'test-evidence-*.json' -ErrorAction SilentlyContinue
+    $EvidenceFiles += Get-ChildItem "$PSScriptRoot" -Filter 'test-output.json' -ErrorAction SilentlyContinue
+    
+    if ($EvidenceFiles.Count -gt 0) {
+        Write-PhaseStatus "Evidence files indexed for audit trail: $($EvidenceFiles.Count) file(s)" 'INFO'
+        
+        foreach ($File in $EvidenceFiles) {
+            $Evidence.Found += $File.Name
+            
+            # Extract correlation IDs from evidence files
+            try {
+                $Content = Get-Content $File.FullName | ConvertFrom-Json -ErrorAction SilentlyContinue
+                if ($Content.CorrelationId) {
+                    $Evidence.CorrelationIds += $Content.CorrelationId
+                }
+            } catch {
+                # Silently skip parse errors - evidence files may be in various formats
+            }
+        }
+        
+        # Report unique correlation IDs (links test runs together)
+        $UniqueCorrelationIds = $Evidence.CorrelationIds | Sort-Object -Unique
+        if ($UniqueCorrelationIds.Count -gt 0) {
+            Write-PhaseStatus "Correlation IDs tracked: $($UniqueCorrelationIds.Count) unique id(s)" 'INFO'
+        }
+        
+        $Evidence.Information = "Evidence files provide sequential verification audit trail - use test-evidence-analysis.ps1 for interpretation"
+    }
+    
+    return $Evidence
+}
+
 # Main verification logic
 Write-PhaseStatus "Starting GuardRails compliance verification" 'INFO'
 
@@ -357,6 +426,10 @@ $AllIssues += $ChangelogIssues
 Write-PhaseStatus "Checking for [Pending] test specs..." 'INFO'
 $PendingIssues = Test-PendingSpecs
 $AllIssues += $PendingIssues
+
+# 7. Evidence file cataloging (audit trail tracking)
+Write-PhaseStatus "Cataloging test evidence files..." 'INFO'
+$EvidenceCatalog = Catalog-EvidenceFiles
 
 # Report results
 if ($AllIssues.Count -eq 0) {

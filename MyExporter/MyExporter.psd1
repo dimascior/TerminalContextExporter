@@ -64,7 +64,8 @@
         'Tests\TmuxSessionReference.Tests.ps1',
         'Test-TmuxAvailability.ps1',
         'Verify-Phase.ps1',
-        'enhanced-test-bridge.ps1'
+        'enhanced-test-bridge.ps1',
+        'test-evidence-analysis.ps1'
     )
 
     # --- Module Metadata ---
