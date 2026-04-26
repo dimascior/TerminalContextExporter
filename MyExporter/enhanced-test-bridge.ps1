@@ -168,7 +168,7 @@ if ($TestScenario -in @("All", "TerminalIntegration") -and $IncludeTerminal) {
         if ($tmuxAvailable) {
             # Test actual tmux session creation
             $testSessionName = "myexporter-test-$evidenceTimestamp"
-            $tmuxResult = & tmux new-session -d -s $testSessionName -c $PWD "echo 'test session'"
+            & tmux new-session -d -s $testSessionName -c $PWD "echo 'test session'"
             
             if ($LASTEXITCODE -eq 0) {
                 # Clean up test session
@@ -201,7 +201,7 @@ if ($TestScenario -in @("All", "GuardRailsCompliance")) {
     try {
         if (Test-Path ".\Verify-Phase.ps1") {
             # Test script execution with available parameters
-            $verifyResult = & ".\Verify-Phase.ps1" -SkipCICheck
+            & ".\Verify-Phase.ps1" -SkipCICheck
             Add-TestResult -TestName "Verify-Phase Execution" -Status "PASS" -Evidence "Verify-Phase script executed successfully"
         } else {
             Add-TestResult -TestName "Verify-Phase Existence" -Status "FAIL" -Evidence "Verify-Phase.ps1 not found"

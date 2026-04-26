@@ -21,7 +21,7 @@ function Test-TmuxAvailability {
         Error = ""
     }
     
-    Write-Host "🖥️  Testing tmux Availability and Functionality" -ForegroundColor Cyan
+    Write-Host "[TEST] Testing tmux Availability and Functionality" -ForegroundColor Cyan
     
     # Determine environment
     $environment = if ($IsWindows -and ((Get-Content /proc/version -ErrorAction SilentlyContinue) -match 'microsoft|wsl')) {
@@ -37,7 +37,7 @@ function Test-TmuxAvailability {
     Write-Host "Environment: $environment"
     
     if ($environment -eq "Unsupported") {
-        Write-Host "⚠️  tmux testing not supported on this platform" -ForegroundColor Yellow
+        Write-Host "[WARN] tmux testing not supported on this platform" -ForegroundColor Yellow
         $results.Error = "Platform not supported for tmux testing"
         return $results
     }
@@ -49,20 +49,26 @@ function Test-TmuxAvailability {
         Write-Host "Step 1: Checking tmux installation..." -ForegroundColor Yellow
         
         $tmuxCommand = if ($environment -eq "WSL2") { "wsl tmux" } else { "tmux" }
-        $versionOutput = Invoke-Expression "$tmuxCommand -V" 2>$null
+        
+        # Use & and command array to avoid Invoke-Expression
+        if ($environment -eq "WSL2") {
+            $versionOutput = & wsl tmux -V 2>$null
+        } else {
+            $versionOutput = & tmux -V 2>$null
+        }
         
         if ($versionOutput -match "tmux (\d+\.\d+)") {
             $results.TmuxInstalled = $true
             $results.Version = $matches[1]
-            Write-Host "✅ tmux installed: $versionOutput" -ForegroundColor Green
+            Write-Host "[PASS] tmux installed: $versionOutput" -ForegroundColor Green
         } else {
-            Write-Host "❌ tmux not available or not responding" -ForegroundColor Red
+            Write-Host "[FAIL] tmux not available or not responding" -ForegroundColor Red
             $results.Error = "tmux command not found or not responding"
             return $results
         }
         
         if (-not $CreateTestSession) {
-            Write-Host "✅ Basic tmux availability confirmed" -ForegroundColor Green
+            Write-Host "[PASS] Basic tmux availability confirmed" -ForegroundColor Green
             return $results
         }
         
@@ -70,21 +76,28 @@ function Test-TmuxAvailability {
         Write-Host "Step 2: Testing session creation..." -ForegroundColor Yellow
         $sessionName = "tmux-test-$(Get-Date -Format 'HHmmss')"
         
-        $createCommand = "$tmuxCommand new-session -d -s $sessionName"
-        Write-Host "Executing: $createCommand" -ForegroundColor Gray
+        Write-Host "Creating session: $sessionName" -ForegroundColor Gray
         
-        Invoke-Expression $createCommand
+        # Use direct command call instead of Invoke-Expression
+        if ($environment -eq "WSL2") {
+            & wsl tmux new-session -d -s $sessionName
+        } else {
+            & tmux new-session -d -s $sessionName
+        }
         Start-Sleep -Seconds 1
         
         # Verify session exists
-        $listCommand = "$tmuxCommand list-sessions"
-        $sessions = Invoke-Expression $listCommand 2>$null
+        if ($environment -eq "WSL2") {
+            $sessions = & wsl tmux list-sessions 2>$null
+        } else {
+            $sessions = & tmux list-sessions 2>$null
+        }
         
         if ($sessions -match $sessionName) {
             $results.SessionCreation = $true
-            Write-Host "✅ Session created successfully: $sessionName" -ForegroundColor Green
+            Write-Host "[PASS] Session created successfully: $sessionName" -ForegroundColor Green
         } else {
-            Write-Host "❌ Session creation failed" -ForegroundColor Red
+            Write-Host "[FAIL] Session creation failed" -ForegroundColor Red
             $results.Error = "Failed to create tmux session"
             return $results
         }
@@ -92,15 +105,21 @@ function Test-TmuxAvailability {
         # Test 3: Command execution
         Write-Host "Step 3: Testing command execution..." -ForegroundColor Yellow
         $testCommand = 'echo "MyExporter tmux test - $(date)"'
-        $sendCommand = "$tmuxCommand send-keys -t $sessionName '$testCommand' Enter"
         
-        Write-Host "Executing: $sendCommand" -ForegroundColor Gray
-        Invoke-Expression $sendCommand
+        Write-Host "Sending command to session: $sessionName" -ForegroundColor Gray
+        if ($environment -eq "WSL2") {
+            & wsl tmux send-keys -t $sessionName $testCommand Enter
+        } else {
+            & tmux send-keys -t $sessionName $testCommand Enter
+        }
         Start-Sleep -Seconds 2
         
-        # Capture output
-        $captureCommand = "$tmuxCommand capture-pane -t $sessionName -p"
-        $output = Invoke-Expression $captureCommand
+        # Capture output using direct command
+        if ($environment -eq "WSL2") {
+            $output = & wsl tmux capture-pane -t $sessionName -p
+        } else {
+            $output = & tmux capture-pane -t $sessionName -p
+        }
         
         Write-Host "Captured output:" -ForegroundColor Gray
         Write-Host $output -ForegroundColor White
@@ -108,48 +127,60 @@ function Test-TmuxAvailability {
         if ($output -match "MyExporter tmux test") {
             $results.CommandExecution = $true
             $results.TestOutput = $output
-            Write-Host "✅ Command execution successful" -ForegroundColor Green
+            Write-Host "[PASS] Command execution successful" -ForegroundColor Green
         } else {
-            Write-Host "❌ Command execution failed or output not captured" -ForegroundColor Red
+            Write-Host "[FAIL] Command execution failed or output not captured" -ForegroundColor Red
             $results.Error = "Command execution verification failed"
         }
         
         # Test 4: Session cleanup
         Write-Host "Step 4: Testing session cleanup..." -ForegroundColor Yellow
-        $killCommand = "$tmuxCommand kill-session -t $sessionName"
         
-        Write-Host "Executing: $killCommand" -ForegroundColor Gray
-        Invoke-Expression $killCommand
+        Write-Host "Killing session: $sessionName" -ForegroundColor Gray
+        if ($environment -eq "WSL2") {
+            & wsl tmux kill-session -t $sessionName
+        } else {
+            & tmux kill-session -t $sessionName
+        }
         Start-Sleep -Seconds 1
         
         # Verify session is gone
-        $sessionsAfter = Invoke-Expression $listCommand 2>$null
+        if ($environment -eq "WSL2") {
+            $sessionsAfter = & wsl tmux list-sessions 2>$null
+        } else {
+            $sessionsAfter = & tmux list-sessions 2>$null
+        }
+        
         if ($sessionsAfter -notmatch $sessionName) {
             $results.SessionCleanup = $true
-            Write-Host "✅ Session cleanup successful" -ForegroundColor Green
+            Write-Host "[PASS] Session cleanup successful" -ForegroundColor Green
         } else {
-            Write-Host "⚠️  Session may still exist" -ForegroundColor Yellow
+            Write-Host "[WARN] Session may still exist" -ForegroundColor Yellow
             $results.SessionCleanup = $false
         }
         
     } catch {
         $results.Error = $_.Exception.Message
-        Write-Host "❌ tmux testing failed: $($_.Exception.Message)" -ForegroundColor Red
+        Write-Host "[FAIL] tmux testing failed: $($_.Exception.Message)" -ForegroundColor Red
         
         # Attempt cleanup if session was created
         if ($results.SessionCreation -and $sessionName) {
             try {
-                Write-Host "Attempting cleanup of test session..." -ForegroundColor Yellow
-                Invoke-Expression "$tmuxCommand kill-session -t $sessionName" 2>$null
+                Write-Host "[INFO] Attempting cleanup of test session..." -ForegroundColor Yellow
+                if ($environment -eq "WSL2") {
+                    & wsl tmux kill-session -t $sessionName 2>$null
+                } else {
+                    & tmux kill-session -t $sessionName 2>$null
+                }
             } catch {
-                Write-Host "Cleanup attempt failed, session may persist" -ForegroundColor Red
+                Write-Host "[WARN] Cleanup attempt failed, session may persist" -ForegroundColor Red
             }
         }
     }
     
     # Summary
     Write-Host ""
-    Write-Host "📊 tmux Capability Summary:" -ForegroundColor Cyan
+    Write-Host "[SUMMARY] tmux Capability Summary:" -ForegroundColor Cyan
     Write-Host "  Environment Supported: $($results.EnvironmentSupported)" -ForegroundColor $(if ($results.EnvironmentSupported) { "Green" } else { "Red" })
     Write-Host "  tmux Installed: $($results.TmuxInstalled)" -ForegroundColor $(if ($results.TmuxInstalled) { "Green" } else { "Red" })
     Write-Host "  Session Creation: $($results.SessionCreation)" -ForegroundColor $(if ($results.SessionCreation) { "Green" } else { "Red" })
@@ -161,7 +192,7 @@ function Test-TmuxAvailability {
     }
     
     $overallSuccess = $results.TmuxInstalled -and $results.SessionCreation -and $results.CommandExecution -and $results.SessionCleanup
-    Write-Host "  Overall: $(if ($overallSuccess) { "✅ READY FOR INTEGRATION" } else { "❌ NOT READY" })" -ForegroundColor $(if ($overallSuccess) { "Green" } else { "Red" })
+    Write-Host "  Overall: $(if ($overallSuccess) { "[PASS] READY FOR INTEGRATION" } else { "[FAIL] NOT READY" })" -ForegroundColor $(if ($overallSuccess) { "Green" } else { "Red" })
     
     return $results
 }

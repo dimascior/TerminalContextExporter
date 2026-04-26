@@ -10,7 +10,6 @@ Set-StrictMode -Version Latest
 # PRINCIPLE: Use $PSScriptRoot for robust pathing, immune to `Set-Location` side effects.
 $privatePath = Join-Path -Path $PSScriptRoot -ChildPath 'Private'
 $publicPath = Join-Path -Path $PSScriptRoot -ChildPath 'Public'
-$classesPath = Join-Path -Path $PSScriptRoot -ChildPath 'Classes'
 
 # STEP 2: Load the context initializer after classes are available
 . "$privatePath/_Initialize.ps1"

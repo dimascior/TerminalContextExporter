@@ -35,12 +35,6 @@ function Export-SystemInfo {
             if ((Test-Path -LiteralPath $script:safeOutputPath) -and $PSCmdlet.ShouldProcess($script:safeOutputPath, "Overwrite existing file")) {
                 Write-Warning "Output file '$script:safeOutputPath' will be overwritten."
             }
-            
-            # ARCHITECTURAL PATTERN: Create forward hashtable for parameter passing
-            $forward = @{
-                UseSSH = $UseSSH
-                ExecutionContext = $myExporterContext
-            }
         }
         
         # ARCHITECTURAL PATTERN: Use ArrayList for PowerShell 5.1 compatibility
@@ -102,6 +96,9 @@ function Export-SystemInfo {
                     param($target, $useSSH, $functionDefs, $correlationId)
                     
                     # Re-hydrate function definitions in job context (GuardRails.md 11.3)
+                    # PSScriptAnalyzer suppression: Necessary for job-safe function injection pattern
+                    # $functionDefs sourced from Get-Content (trusted file read, not user input)
+                    # PSScriptAnalyzer ignore: PSAvoidUsingInvokeExpression
                     Invoke-Expression $functionDefs
                     
                     try {
