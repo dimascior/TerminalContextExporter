@@ -9,6 +9,13 @@ test-params.ps1
 test_claude_analysis.ps1
 claude-*-test.sh
 
+# Test evidence and artifacts (generated during local testing, not tracked)
+# Evidence files are compared against GitHub Actions baselines, not committed
+MyExporter/evidence-local-*.json
+MyExporter/test-evidence-*.json
+MyExporter/test-output.json
+MyExporter/TestResults.xml
+
 # Temporary files
 *.tmp
 *.temp

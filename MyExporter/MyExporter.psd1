@@ -65,7 +65,11 @@
         'Test-TmuxAvailability.ps1',
         'Verify-Phase.ps1',
         'enhanced-test-bridge.ps1',
-        'test-evidence-analysis.ps1'
+        'test-evidence-analysis.ps1',
+        'test-evidence-reproducibility-verification.ps1',
+        'normalize-evidence-for-comparison.ps1',
+        'compare-evidence-sets.ps1',
+        'download-actions-evidence.ps1'
     )
 
     # --- Module Metadata ---

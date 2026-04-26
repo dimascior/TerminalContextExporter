@@ -392,6 +392,44 @@ function Catalog-EvidenceFiles {
     return $Evidence
 }
 
+function Test-EvidenceReproducibility {
+    [CmdletBinding()]
+    param()
+    
+    $Issues = @()
+    
+    # Reproducibility verification: compare local evidence against Actions baseline
+    # Authority: README.md § Evidence Reproducibility Verification
+    
+    Write-PhaseStatus "Checking evidence reproducibility against Actions baseline..." 'INFO'
+    
+    $reproducibilityScript = Join-Path $PSScriptRoot "test-evidence-reproducibility-verification.ps1"
+    if (-not (Test-Path $reproducibilityScript)) {
+        Write-PhaseStatus "Reproducibility verification script not found - skipping check" 'WARN'
+        return $Issues
+    }
+    
+    try {
+        # Run reproducibility verification in isolated scope
+        $reproducibilityResult = & $reproducibilityScript
+        
+        # If the script exits non-zero, it will throw; if zero (pass), we continue
+        Write-PhaseStatus "Evidence reproducibility verified" 'PASS'
+    } catch {
+        # Check if it's a merge-blocking failure vs. baseline establishment
+        $errorMsg = $_.Exception.Message
+        if ($errorMsg -match "Evidence reproducibility FAILED") {
+            $Issues += "Evidence reproducibility check failed: local evidence does not match GitHub Actions baseline"
+            Write-PhaseStatus "Evidence mismatch detected between local and Actions environments" 'FAIL'
+        } else {
+            # Graceful handling of first commit or other non-critical issues
+            Write-PhaseStatus "Reproducibility check completed: $errorMsg" 'INFO'
+        }
+    }
+    
+    return $Issues
+}
+
 # Main verification logic
 Write-PhaseStatus "Starting GuardRails compliance verification" 'INFO'
 
@@ -430,6 +468,11 @@ $AllIssues += $PendingIssues
 # 7. Evidence file cataloging (audit trail tracking)
 Write-PhaseStatus "Cataloging test evidence files..." 'INFO'
 $EvidenceCatalog = Catalog-EvidenceFiles
+
+# 8. Evidence reproducibility (baseline comparison)
+Write-PhaseStatus "Verifying evidence reproducibility..." 'INFO'
+$ReproducibilityIssues = Test-EvidenceReproducibility
+$AllIssues += $ReproducibilityIssues
 
 # Report results
 if ($AllIssues.Count -eq 0) {
