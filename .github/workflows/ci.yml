@@ -321,6 +321,9 @@ jobs:
     name: "🔒 Constitutional Security Validation"
     runs-on: ubuntu-latest
     needs: systematic-validation-matrix
+    permissions:
+      security-events: write
+      contents: read
     steps:
     - uses: actions/checkout@v4
     
@@ -333,7 +336,7 @@ jobs:
         output: 'trivy-constitutional-results.sarif'
     
     - name: Upload Constitutional Security Results
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@v4
       with:
         sarif_file: 'trivy-constitutional-results.sarif'
     
