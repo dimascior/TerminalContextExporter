@@ -110,6 +110,14 @@ jobs:
             constitutional_role: "primary"
             description: "🎯 Primary Target - PowerShell 7.4 Core Windows"
           
+          # Ubuntu Linux - Systemd-based
+          - os: ubuntu-latest
+            psver: '7.4'
+            shell: 'pwsh'
+            constitutional_role: "ubuntu"
+            distro: 'ubuntu'
+            description: "🐧 Ubuntu Linux - PowerShell 7.4 Systemd"
+          
           # Void Linux Minimalist Distro
           - os: ubuntu-latest
             psver: '7.4'
