@@ -259,26 +259,32 @@ function Test-FileList {
     )
     
     # Check that all new files are tracked (excluding test artifacts)
-    $GitStatus = git status --porcelain 2>$null
-    if ($GitStatus) {
-        $UntrackedFiles = $GitStatus | Where-Object { $_ -match '^\?\?' }
-        if ($UntrackedFiles) {
-            # Filter out legitimate test artifacts generated during test execution
-            $TrackedCodeViolations = $UntrackedFiles | Where-Object {
-                $filePath = $_ -replace '^\?\?\s+', ''
-                $isTestArtifact = $false
-                foreach ($pattern in $TestArtifactPatterns) {
-                    if ($filePath -match $pattern) {
-                        $isTestArtifact = $true
-                        break
+    # Only check if git is available (skip on systems like WSL Void without git)
+    if (Get-Command git -ErrorAction SilentlyContinue) {
+        $GitStatus = git status --porcelain 2>$null
+        if ($GitStatus) {
+            $UntrackedFiles = $GitStatus | Where-Object { $_ -match '^\?\?' }
+            if ($UntrackedFiles) {
+                # Filter out legitimate test artifacts generated during test execution
+                $TrackedCodeViolations = $UntrackedFiles | Where-Object {
+                    $filePath = $_ -replace '^\?\?\s+', ''
+                    $isTestArtifact = $false
+                    foreach ($pattern in $TestArtifactPatterns) {
+                        if ($filePath -match $pattern) {
+                            $isTestArtifact = $true
+                            break
+                        }
                     }
+                    -not $isTestArtifact
                 }
-                -not $isTestArtifact
-            }
-            if ($TrackedCodeViolations) {
-                $Issues += "Untracked code files found: $($TrackedCodeViolations -join ', ') (test artifacts excluded by policy)"
+                if ($TrackedCodeViolations) {
+                    $Issues += "Untracked code files found: $($TrackedCodeViolations -join ', ') (test artifacts excluded by policy)"
+                }
             }
         }
+    }
+    else {
+        Write-Host "[SKIP] Git check skipped (git not available on this system)" -ForegroundColor Yellow
     }
     
     # Check manifest FileList accuracy

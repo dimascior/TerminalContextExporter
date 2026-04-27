@@ -109,6 +109,14 @@ jobs:
             shell: 'pwsh'
             constitutional_role: "primary"
             description: "🎯 Primary Target - PowerShell 7.4 Core Windows"
+          
+          # Void Linux Minimalist Distro
+          - os: ubuntu-latest
+            psver: '7.4'
+            shell: 'pwsh'
+            constitutional_role: "void"
+            distro: 'void'
+            description: "🐧 Void Linux - PowerShell 7.4 Minimalist"
     
     steps:
     - uses: actions/checkout@v4
