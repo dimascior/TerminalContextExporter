@@ -143,7 +143,10 @@ function Export-SystemInfo {
 
     end {
         if ($results.Count -eq 0) {
-            Write-Warning "No data collected. Output file not created."
+            # Don't warn if WhatIf was explicitly requested - this is expected behavior
+            if (-not $WhatIfPreference) {
+                Write-Warning "No data collected. Output file not created."
+            }
             return
         }
 
