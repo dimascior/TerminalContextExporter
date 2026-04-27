@@ -18,7 +18,9 @@ In CI: Attempts Trivy scan if available
 #>
 
 [CmdletBinding()]
-param()
+param(
+    [string]$EvidencePath = ".artifacts/evidence/local"
+)
 
 $CommitSha = git rev-parse --short HEAD 2>$null
 if (-not $CommitSha) { $CommitSha = "unknown" }
@@ -207,9 +209,8 @@ Write-Host "  * This is a separate policy from constitutional verification"
 Write-Host "=================================================" -ForegroundColor Yellow
 
 # Ensure artifacts directory exists
-$EvidenceDir = ".artifacts/evidence/local"
-if (-not (Test-Path $EvidenceDir)) {
-    New-Item -ItemType Directory -Path $EvidenceDir -Force | Out-Null
+if (-not (Test-Path $EvidencePath)) {
+    New-Item -ItemType Directory -Path $EvidencePath -Force | Out-Null
 }
 
 # Generate correlation ID (consistent across all phase evidence)
@@ -218,7 +219,7 @@ $Scan | Add-Member -MemberType NoteProperty -Name "CorrelationId" -Value $Correl
 
 # Generate timestamp-based filename
 $Timestamp = Get-Date -Format 'yyyy-MM-dd-HHmm'
-$EvidenceFile = Join-Path $EvidenceDir "security-scan-$Timestamp.json"
+$EvidenceFile = Join-Path $EvidencePath "security-scan-$Timestamp.json"
 
 # Write evidence file
 $Scan | ConvertTo-Json -Depth 10 | Out-File -FilePath $EvidenceFile -Encoding UTF8

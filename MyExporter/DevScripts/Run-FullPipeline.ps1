@@ -59,7 +59,9 @@ Write-Host "[PHASE 2/5] Anti-Simulation Enforcement" -ForegroundColor Yellow
 Write-Host "-----" -ForegroundColor Yellow
 
 $Phase2Start = Get-Date
-& "$DevScriptsPath\Assert-NoSimulatedTests.ps1" -TestPath "./Tests" -FailOnSimulation $true
+$TestPath = Join-Path $ProjectRoot "MyExporter\Tests"
+$EvidencePath = Join-Path $ProjectRoot "MyExporter\.artifacts\evidence\local"
+& "$DevScriptsPath\Assert-NoSimulatedTests.ps1" -TestPath $TestPath -EvidencePath $EvidencePath -FailOnSimulation $true
 $Phase2Exit = $LASTEXITCODE
 $Phase2Duration = ((Get-Date) - $Phase2Start).TotalSeconds
 
@@ -111,7 +113,8 @@ Write-Host "[PHASE 4/5] Constitutional Compliance Verification" -ForegroundColor
 Write-Host "-----" -ForegroundColor Yellow
 
 $Phase4Start = Get-Date
-& "$DevScriptsPath\New-ComplianceFinalJson.ps1" -DocsPath $DocsPath -EvidencePath ".artifacts/evidence/local"
+$OutputFile = Join-Path $EvidencePath "compliance-final.json"
+& "$DevScriptsPath\New-ComplianceFinalJson.ps1" -DocsPath $DocsPath -EvidencePath $EvidencePath -OutputFile $OutputFile
 $Phase4Exit = $LASTEXITCODE
 $Phase4Duration = ((Get-Date) - $Phase4Start).TotalSeconds
 
@@ -137,7 +140,7 @@ Write-Host "[PHASE 5/5] Security Constitutional Scan" -ForegroundColor Yellow
 Write-Host "-----" -ForegroundColor Yellow
 
 $Phase5Start = Get-Date
-& "$DevScriptsPath\Test-Phase5-Security.ps1"
+& "$DevScriptsPath\Test-Phase5-Security.ps1" -EvidencePath $EvidencePath
 $Phase5Exit = $LASTEXITCODE
 $Phase5Duration = ((Get-Date) - $Phase5Start).TotalSeconds
 
