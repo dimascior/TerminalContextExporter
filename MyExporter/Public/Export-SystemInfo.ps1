@@ -14,6 +14,17 @@ function Export-SystemInfo {
     )
 
     begin {
+        # Initialize required script variables early
+        $script:useFastPath = $false
+        $script:safeOutputPath = $OutputPath
+        $results = New-Object System.Collections.ArrayList
+        
+        # WhatIf Early Return: Gracefully handle WhatIf without executing actual logic
+        if ($WhatIfPreference) {
+            Write-Verbose "WhatIf mode active - skipping execution logic"
+            return
+        }
+        
         # FASTPATH ESCAPE HATCH: Environment-controlled architectural bypass
         # This demonstrates the framework's pragmatic approach to avoiding tail-chasing
         if ($env:MYEXPORTER_FAST_PATH) {
@@ -22,8 +33,6 @@ function Export-SystemInfo {
             # Create simple output path for FastPath mode
             $script:safeOutputPath = $OutputPath
         } else {
-            $script:useFastPath = $false
-            
             # ARCHITECTURAL PATTERN: Establish execution context first
             $myExporterContext = Get-ExecutionContext
             Write-Debug "Execution context established: $($myExporterContext.CorrelationId)"
@@ -36,9 +45,6 @@ function Export-SystemInfo {
                 Write-Warning "Output file '$script:safeOutputPath' will be overwritten."
             }
         }
-        
-        # ARCHITECTURAL PATTERN: Use ArrayList for PowerShell 5.1 compatibility
-        $results = New-Object System.Collections.ArrayList
     }
 
     process {
