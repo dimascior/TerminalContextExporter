@@ -251,7 +251,7 @@ jobs:
         $TestScriptsDir = Join-Path $ArtifactRoot "test-scripts"
         New-Item -ItemType Directory -Path $TestScriptsDir -Force | Out-Null
         Copy-Item -Path "${{ github.workspace }}/MyExporter/Tests/*.ps1" -Destination $TestScriptsDir -Force
-        Write-Host "✅ Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
+        Write-Host "Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
         Get-ChildItem -Path $TestScriptsDir -File | Write-Host
     
     - name: Run Constitutional Pester Tests (PowerShell 7.x)
@@ -278,7 +278,7 @@ jobs:
         $TestScriptsDir = Join-Path $ArtifactRoot "test-scripts"
         New-Item -ItemType Directory -Path $TestScriptsDir -Force | Out-Null
         Copy-Item -Path "${{ github.workspace }}/MyExporter/Tests/*.ps1" -Destination $TestScriptsDir -Force
-        Write-Host "✅ Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
+        Write-Host "Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
         Get-ChildItem -Path $TestScriptsDir -File | Write-Host
     
     - name: Run MyExporter Systematic Phase Validation (Windows)
