@@ -116,7 +116,7 @@ jobs:
             shell: 'pwsh'
             constitutional_role: "ubuntu"
             distro: 'ubuntu'
-            description: "🐧 Ubuntu Linux - PowerShell 7.4 Systemd"
+            description: "Ubuntu Linux - PowerShell 7.4 Systemd"
           
           # Void Linux Minimalist Distro
           - os: ubuntu-latest
@@ -124,7 +124,7 @@ jobs:
             shell: 'pwsh'
             constitutional_role: "void"
             distro: 'void'
-            description: "🐧 Void Linux - PowerShell 7.4 Minimalist"
+            description: "Void Linux - PowerShell 7.4 Minimalist"
     
     steps:
     - uses: actions/checkout@v4
