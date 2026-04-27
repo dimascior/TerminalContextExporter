@@ -21,6 +21,8 @@ Write-Host ""
 
 $PipelineStart = Get-Date
 $DevScriptsPath = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $DevScriptsPath)
+$DocsPath = Join-Path $ProjectRoot "docs"
 
 $PhaseResults = @()
 
@@ -31,7 +33,7 @@ Write-Host "[PHASE 1/5] Constitutional Verification" -ForegroundColor Yellow
 Write-Host "-----" -ForegroundColor Yellow
 
 $Phase1Start = Get-Date
-& "$DevScriptsPath\Test-Phase1-Compliance.ps1"
+& "$DevScriptsPath\Test-Phase1-Compliance.ps1" -DocsPath $DocsPath
 $Phase1Exit = $LASTEXITCODE
 $Phase1Duration = ((Get-Date) - $Phase1Start).TotalSeconds
 
@@ -109,7 +111,7 @@ Write-Host "[PHASE 4/5] Constitutional Compliance Verification" -ForegroundColor
 Write-Host "-----" -ForegroundColor Yellow
 
 $Phase4Start = Get-Date
-& "$DevScriptsPath\New-ComplianceFinalJson.ps1" -EvidencePath "./.artifacts/evidence/local"
+& "$DevScriptsPath\New-ComplianceFinalJson.ps1" -DocsPath $DocsPath -EvidencePath ".artifacts/evidence/local"
 $Phase4Exit = $LASTEXITCODE
 $Phase4Duration = ((Get-Date) - $Phase4Start).TotalSeconds
 
