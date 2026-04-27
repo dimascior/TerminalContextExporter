@@ -243,6 +243,17 @@ jobs:
           Write-Host "✅ Constitutional Pester tests passed (5.1)" -ForegroundColor Green
         }
     
+    - name: Archive Test Scripts to Artifacts (PS 5.1)
+      if: always() && matrix.psver == '5.1'
+      shell: powershell
+      run: |
+        $ArtifactRoot = Join-Path "${{ github.workspace }}/MyExporter" ".artifacts/evidence/local"
+        $TestScriptsDir = Join-Path $ArtifactRoot "test-scripts"
+        New-Item -ItemType Directory -Path $TestScriptsDir -Force | Out-Null
+        Copy-Item -Path "${{ github.workspace }}/MyExporter/Tests/*.ps1" -Destination $TestScriptsDir -Force
+        Write-Host "✅ Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
+        Get-ChildItem -Path $TestScriptsDir -File | Write-Host
+    
     - name: Run Constitutional Pester Tests (PowerShell 7.x)
       if: matrix.psver != '5.1'
       shell: pwsh
@@ -258,6 +269,17 @@ jobs:
           }
           Write-Host "✅ Constitutional Pester tests passed (7.x)" -ForegroundColor Green
         }
+    
+    - name: Archive Test Scripts to Artifacts
+      if: always()
+      shell: pwsh
+      run: |
+        $ArtifactRoot = Join-Path "${{ github.workspace }}/MyExporter" ".artifacts/evidence/local"
+        $TestScriptsDir = Join-Path $ArtifactRoot "test-scripts"
+        New-Item -ItemType Directory -Path $TestScriptsDir -Force | Out-Null
+        Copy-Item -Path "${{ github.workspace }}/MyExporter/Tests/*.ps1" -Destination $TestScriptsDir -Force
+        Write-Host "✅ Test scripts archived to: $TestScriptsDir" -ForegroundColor Green
+        Get-ChildItem -Path $TestScriptsDir -File | Write-Host
     
     - name: Run MyExporter Systematic Phase Validation (Windows)
       if: matrix.os == 'windows-latest'
@@ -304,6 +326,7 @@ jobs:
         path: |
           MyExporter/.artifacts/evidence/local/TestResults.xml
           MyExporter/.artifacts/evidence/local/*.json
+          MyExporter/.artifacts/evidence/local/test-scripts/*.ps1
     
     - name: Upload Evidence for Reproducibility Verification
       uses: actions/upload-artifact@v4
