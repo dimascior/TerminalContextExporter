@@ -100,6 +100,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Store CI Pester NUnit output in `MyExporter/.artifacts/evidence/local/TestResults.xml` and upload it from the canonical evidence directory
+- Align task-loop documentation with the canonical Pester test-results artifact location
+
+### Fixed
+- Make `Export-SystemInfo.Tests.ps1` resolve its temp output path portably when `$env:TEMP` is unset on PowerShell 7 Linux runners
+
 ### Planned
 - Performance optimizations for large-scale deployments
 - Enhanced error reporting and diagnostics

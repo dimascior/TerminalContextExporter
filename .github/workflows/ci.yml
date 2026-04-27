@@ -224,8 +224,11 @@ jobs:
       shell: powershell
       run: |
         if (Test-Path "${{ github.workspace }}/MyExporter") {
+          $ArtifactRoot = Join-Path "${{ github.workspace }}/MyExporter" ".artifacts/evidence/local"
+          New-Item -ItemType Directory -Path $ArtifactRoot -Force | Out-Null
+          $PesterResultsPath = Join-Path $ArtifactRoot "TestResults.xml"
           Import-Module "${{ github.workspace }}/MyExporter" -Force
-          $TestResults = Invoke-Pester -Path "${{ github.workspace }}/MyExporter/Tests" -PassThru -OutputFormat NUnitXml -OutputFile TestResults.xml
+          $TestResults = Invoke-Pester -Path "${{ github.workspace }}/MyExporter/Tests" -PassThru -OutputFormat NUnitXml -OutputFile $PesterResultsPath
           if ($TestResults.FailedCount -gt 0) {
             throw "CONSTITUTIONAL_BAILOUT: $($TestResults.FailedCount) constitutional tests failed"
           }
@@ -237,8 +240,11 @@ jobs:
       shell: pwsh
       run: |
         if (Test-Path "${{ github.workspace }}/MyExporter") {
+          $ArtifactRoot = Join-Path "${{ github.workspace }}/MyExporter" ".artifacts/evidence/local"
+          New-Item -ItemType Directory -Path $ArtifactRoot -Force | Out-Null
+          $PesterResultsPath = Join-Path $ArtifactRoot "TestResults.xml"
           Import-Module "${{ github.workspace }}/MyExporter" -Force
-          $TestResults = Invoke-Pester -Path "${{ github.workspace }}/MyExporter/Tests" -PassThru -OutputFormat NUnitXml -OutputFile TestResults.xml
+          $TestResults = Invoke-Pester -Path "${{ github.workspace }}/MyExporter/Tests" -PassThru -OutputFormat NUnitXml -OutputFile $PesterResultsPath
           if ($TestResults.FailedCount -gt 0) {
             throw "CONSTITUTIONAL_BAILOUT: $($TestResults.FailedCount) constitutional tests failed"
           }
@@ -288,7 +294,7 @@ jobs:
       with:
         name: constitutional-test-results-${{ matrix.os }}-${{ matrix.psver }}
         path: |
-          TestResults.xml
+          MyExporter/.artifacts/evidence/local/TestResults.xml
           MyExporter/.artifacts/evidence/local/*.json
     
     - name: Upload Evidence for Reproducibility Verification

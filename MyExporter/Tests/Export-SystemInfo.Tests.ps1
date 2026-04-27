@@ -65,7 +65,12 @@ Describe "Export-SystemInfo Parameter Block Regression Test" {
     Context "Function Invocation" {
         
         It "Should accept WhatIf parameter without error" {
-            $TestPath = Join-Path $env:TEMP "pester-test-output.json"
+            $TempRoot = if ([string]::IsNullOrWhiteSpace($env:TEMP)) {
+                [System.IO.Path]::GetTempPath()
+            } else {
+                $env:TEMP
+            }
+            $TestPath = Join-Path $TempRoot "pester-test-output.json"
             
             # This should not throw an exception
             { Export-SystemInfo -ComputerName "localhost" -OutputPath $TestPath -Format "JSON" -AsJson -WhatIf } | 
