@@ -69,7 +69,16 @@
         'test-evidence-reproducibility-verification.ps1',
         'normalize-evidence-for-comparison.ps1',
         'compare-evidence-sets.ps1',
-        'download-actions-evidence.ps1'
+        'download-actions-evidence.ps1',
+        'Adapters\Helios\HeliosIntegrityBridge.ps1',
+        'Adapters\Helios\README.md',
+        'Adapters\Helios\schemas\helios-envelope.schema.json',
+        'Adapters\Helios\schemas\helios-baseline.schema.json',
+        'Adapters\Helios\schemas\helios-command-evidence.schema.json',
+        'Adapters\Helios\tools\Sync-HeliosBridge.ps1',
+        'Adapters\Helios\tools\New-HeliosEnvelopeManifest.ps1',
+        'Adapters\Helios\tools\Test-HeliosEnvelopeIntegrity.ps1',
+        'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1'
     )
 
     # --- Module Metadata ---
