@@ -122,3 +122,35 @@ See `schemas/` for JSON Schema definitions of:
 - `helios-envelope.v1` — durable manifest
 - `helios-baseline.v1` — session baseline
 - `helios-command-evidence.v1` — before, decision, after, compare evidence
+
+## Current Status
+
+**Phase:** 3.97 — gap-test completion and lock-requirement derivation.
+
+| Component | Status |
+|---|---|
+| Bridge implementation (7 functions) | Complete |
+| Sync, manifest, integrity tools | Complete |
+| Pester test suite (18 tests) | Complete |
+| Schemas (3 JSON Schema files) | Complete |
+| TCE adapter spec | Complete — `docs/tce-helios-integrity-adapter-spec.md` |
+| Orchestration workflow | Complete — `tools/Invoke-HeliosGapTest.ps1` |
+| Evidence parser/normalizer | Complete — `tools/ConvertFrom-HeliosEvidence.ps1` |
+| Gap-test matrix (12 tests) | Complete — `evidence/gap-tests/` |
+| Phase 4 lock requirements | Complete — `docs/phase4-lock-requirements-from-gap-tests.md` |
+| TCE main preservation | Preserved — main has no adapter entries |
+
+### Branch Ownership
+
+- **helios-integrity-adapter** — active implementation branch for adapter work
+- **main** — preserved clean public-facing MyExporter module (no Adapters/Helios)
+
+### Phase Roadmap
+
+| Phase | Status |
+|---|---|
+| Phase 0-3.96 | Complete (Helios runtime + TCE bridge) |
+| Phase 3.97 | Complete (TCE gap-tests + lock derivation) |
+| Phase 4 | Requirements derived — implementation not started |
+| Phase 5 | Future — helios-lock package |
+| Phase 6 | Future — lock verification evidence |

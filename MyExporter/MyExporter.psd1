@@ -78,6 +78,11 @@
         'Adapters\Helios\tools\Sync-HeliosBridge.ps1',
         'Adapters\Helios\tools\New-HeliosEnvelopeManifest.ps1',
         'Adapters\Helios\tools\Test-HeliosEnvelopeIntegrity.ps1',
+        'Adapters\Helios\tools\Invoke-HeliosGapTest.ps1',
+        'Adapters\Helios\tools\ConvertFrom-HeliosEvidence.ps1',
+        'Adapters\Helios\tools\New-HeliosGapTestMatrix.ps1',
+        'Adapters\Helios\docs\tce-helios-integrity-adapter-spec.md',
+        'Adapters\Helios\docs\phase4-lock-requirements-from-gap-tests.md',
         'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1'
     )
 
