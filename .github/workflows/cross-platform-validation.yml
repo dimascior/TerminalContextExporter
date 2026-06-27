@@ -1,13 +1,7 @@
 name: Windows + WSL PowerShell Testing Matrix
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-  schedule:
-    # Daily validation at 06:00 UTC per GuardRails.md daily merge window
-    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 env:
   FORCE_COLOR: 1

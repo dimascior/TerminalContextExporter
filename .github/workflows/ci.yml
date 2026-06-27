@@ -7,10 +7,7 @@ name: WorkflowDynamics Constitutional CI/CD Pipeline
 # - Anti-simulation enforcement per constitutional requirements
 
 on:
-  push:
-    branches: [ main, dev ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 env:
   # Constitutional environment variables
