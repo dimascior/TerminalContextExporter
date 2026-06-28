@@ -99,6 +99,7 @@
         'Adapters\Helios\tools\Test-HeliosEndToEndInstallPlan.ps1',
         'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1',
         'Adapters\Helios\docs\phase3991-package-validation-results.md',
+        'Adapters\Helios\docs\phase40-lock-design-from-gap-evidence.md',
         'Adapters\Helios\evidence\package-validation\phase3991-validation-summary.json'
     )
 

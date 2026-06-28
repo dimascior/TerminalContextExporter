@@ -165,7 +165,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 
 ## Current Status
 
-**Phase:** 3.99.1 — package validation, manifest hardening, end-to-end execution proof.
+**Phase:** 4.0 — lock design from gap evidence.
 
 | Component | Status |
 |---|---|
@@ -186,6 +186,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | BOM hardening | Complete — manifest/sidecar writes BOM-free, integrity check includes BOM detection |
 | Package validation (3.99.1) | Complete — adapter verifier BOM checks, runtime manifest completeness, e2e execution |
 | Install sequence | Complete — `docs/install-sequence.md` |
+| Lock design (4.0) | Complete — `docs/phase40-lock-design-from-gap-evidence.md` |
 | TCE main preservation | Preserved — main has no adapter entries |
 
 ### Branch Ownership
@@ -202,6 +203,9 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | Phase 3.98 | Complete (packaging architecture + install tooling) |
 | Phase 3.99 | Complete (runtime bundle + BOM hardening + e2e simulation) |
 | Phase 3.99.1 | Complete (package validation + manifest hardening + execution proof) |
-| Phase 4 | Requirements derived — implementation not started |
-| Phase 5 | Future — helios-lock package |
-| Phase 6 | Future — lock verification evidence |
+| Phase 3.99.2 | Complete (final readback audit) |
+| Phase 4.0 | Complete (lock design from gap evidence) |
+| Phase 4.1 | Future — lock/unlock/rebaseline tooling |
+| Phase 4.2 | Future — live lock verification evidence |
+| Phase 5 | Future — lock system packaging |
+| Phase 6 | Future — long-term lock verification + audit strategy |
