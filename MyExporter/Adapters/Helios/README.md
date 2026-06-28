@@ -143,16 +143,20 @@ gh release download v0.3.98 --repo <owner>/TerminalContextExporter
 
 | Tool | Purpose |
 |---|---|
-| `tools/New-HeliosAdapterPackage.ps1` | Build a distributable package from the adapter branch |
-| `tools/Test-HeliosAdapterPackage.ps1` | Verify package contents and checksums |
-| `tools/New-HeliosInstallPlan.ps1` | Generate install plan for a target machine |
+| `tools/New-HeliosAdapterPackage.ps1` | Build a distributable TCE adapter package |
+| `tools/Test-HeliosAdapterPackage.ps1` | Verify adapter package contents and checksums |
+| `tools/New-HeliosRuntimeBundle.ps1` | Build a distributable Helios runtime bundle |
+| `tools/Test-HeliosRuntimeBundle.ps1` | Verify runtime bundle contents, checksums, BOM safety |
+| `tools/New-HeliosCombinedInstallPlan.ps1` | Generate full install plan from both packages |
+| `tools/Test-HeliosEndToEndInstallPlan.ps1` | Simulate install in temp directory |
+| `tools/New-HeliosInstallPlan.ps1` | Generate adapter-only install plan |
 
 ### Install Flow
 
-1. Pull adapter package (git clone or release zip).
-2. Verify package: `Test-HeliosAdapterPackage.ps1 -PackageRoot <path>`.
-3. Generate install plan: `New-HeliosInstallPlan.ps1 -PackageRoot <path> -HeliosTargetRoot <path>`.
-4. Copy bridge, create directories, generate local manifest.
+1. Pull adapter package and runtime bundle.
+2. Verify both: `Test-HeliosAdapterPackage.ps1` and `Test-HeliosRuntimeBundle.ps1`.
+3. Generate combined install plan: `New-HeliosCombinedInstallPlan.ps1`.
+4. Copy runtime files, sync bridge, generate BOM-free local manifest.
 5. Verify envelope: `Test-HeliosEnvelopeIntegrity.ps1 -HeliosGateRoot <path>`.
 6. Review and approve hook activation in `settings.json`.
 7. Run smoke tests.
@@ -161,7 +165,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 
 ## Current Status
 
-**Phase:** 3.98 — fork-pull packaging and installation architecture.
+**Phase:** 3.99 — runtime bundle packaging and BOM hardening.
 
 | Component | Status |
 |---|---|
@@ -175,7 +179,11 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | Gap-test matrix (12 tests) | Complete — `evidence/gap-tests/` |
 | Phase 4 lock requirements | Complete — `docs/phase4-lock-requirements-from-gap-tests.md` |
 | Package architecture | Complete — `docs/package-architecture.md` |
-| Package tools (3) | Complete — build, verify, install-plan |
+| Adapter package tools (3) | Complete — build, verify, install-plan |
+| Runtime bundle tools (2) | Complete — build, verify |
+| Combined installer | Complete — `tools/New-HeliosCombinedInstallPlan.ps1` |
+| End-to-end simulation | Complete — `tools/Test-HeliosEndToEndInstallPlan.ps1` |
+| BOM hardening | Complete — manifest/sidecar writes BOM-free, integrity check includes BOM detection |
 | Install sequence | Complete — `docs/install-sequence.md` |
 | TCE main preservation | Preserved — main has no adapter entries |
 
@@ -191,6 +199,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | Phase 0-3.96 | Complete (Helios runtime + TCE bridge) |
 | Phase 3.97 | Complete (TCE gap-tests + lock derivation) |
 | Phase 3.98 | Complete (packaging architecture + install tooling) |
+| Phase 3.99 | Complete (runtime bundle + BOM hardening + e2e simulation) |
 | Phase 4 | Requirements derived — implementation not started |
 | Phase 5 | Future — helios-lock package |
 | Phase 6 | Future — lock verification evidence |

@@ -122,11 +122,24 @@ if ($SessionId) {
     }
 }
 
+$bomCheck = @{ manifest_bom_free = $true; sidecar_bom_free = $true }
+$manifestRaw = [System.IO.File]::ReadAllBytes($manifestPath)
+if ($manifestRaw.Length -ge 3 -and $manifestRaw[0] -eq 0xEF -and $manifestRaw[1] -eq 0xBB -and $manifestRaw[2] -eq 0xBF) {
+    $bomCheck.manifest_bom_free = $false
+    $verdict = 'DRIFT'
+}
+$sidecarRaw = [System.IO.File]::ReadAllBytes($sidecarPath)
+if ($sidecarRaw.Length -ge 3 -and $sidecarRaw[0] -eq 0xEF -and $sidecarRaw[1] -eq 0xBB -and $sidecarRaw[2] -eq 0xBF) {
+    $bomCheck.sidecar_bom_free = $false
+    $verdict = 'DRIFT'
+}
+
 $result = @{
     timestamp_utc  = (Get-Date).ToUniversalTime().ToString('o')
     verdict        = $verdict
     sidecar_valid  = $true
     manifest_hash  = $computedManifestHash
+    bom_check      = $bomCheck
     file_details   = $details
 }
 

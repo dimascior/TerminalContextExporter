@@ -88,9 +88,15 @@
         'Adapters\Helios\docs\install-sequence.md',
         'Adapters\Helios\docs\package-manifest-schema.md',
         'Adapters\Helios\docs\phase398-packaging-decision.md',
+        'Adapters\Helios\docs\helios-runtime-bundle-contract.md',
+        'Adapters\Helios\docs\phase399-operational-enforcement-observations.md',
         'Adapters\Helios\tools\New-HeliosAdapterPackage.ps1',
         'Adapters\Helios\tools\Test-HeliosAdapterPackage.ps1',
         'Adapters\Helios\tools\New-HeliosInstallPlan.ps1',
+        'Adapters\Helios\tools\New-HeliosRuntimeBundle.ps1',
+        'Adapters\Helios\tools\Test-HeliosRuntimeBundle.ps1',
+        'Adapters\Helios\tools\New-HeliosCombinedInstallPlan.ps1',
+        'Adapters\Helios\tools\Test-HeliosEndToEndInstallPlan.ps1',
         'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1'
     )
 

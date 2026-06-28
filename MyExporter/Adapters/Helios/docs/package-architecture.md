@@ -162,12 +162,33 @@ PowerShell scripts ship as source for this phase:
 - Checksums and optional signatures provide integrity without compilation.
 - Compiled executables may be considered later for a specific operational need (performance, distribution simplification, or obfuscation of proprietary logic). No such need exists today.
 
+## Runtime Bundle Tooling (Phase 3.99)
+
+Phase 3.99 adds the Helios runtime bundle as the second installable package:
+
+| Tool | Purpose |
+|---|---|
+| `New-HeliosRuntimeBundle.ps1` | Build a distributable runtime bundle from a Helios repo checkout |
+| `Test-HeliosRuntimeBundle.ps1` | Verify runtime bundle contents, checksums, and BOM safety |
+| `New-HeliosCombinedInstallPlan.ps1` | Generate a full install plan consuming both packages |
+| `Test-HeliosEndToEndInstallPlan.ps1` | Simulate a full install in a temp directory |
+
+### BOM Hardening
+
+All JSON writers in the install trust path use `[System.IO.File]::WriteAllText()` with `$Utf8NoBom`. The `Test-HeliosEnvelopeIntegrity.ps1` tool includes a BOM safety check on manifest and sidecar. Runtime bundle and adapter package verifiers check all JSON files for BOM presence.
+
+### End-to-End Install Simulation
+
+`Test-HeliosEndToEndInstallPlan.ps1` creates a temporary directory, runs both package verifiers, executes the combined install plan in Prepare mode, generates a local manifest and sidecar, verifies BOM absence, checks envelope integrity, and validates settings activation and rollback plans.
+
 ## Future Packaging Options
 
 | Option | Phase | Status |
 |---|---|---|
 | Git clone from adapter branch | 3.98 | Recommended for development |
 | GitHub release artifact (zip) | 3.98 | Recommended for distribution |
+| Helios runtime bundle | 3.99 | Complete — runtime packaging tooled |
+| End-to-end install simulation | 3.99 | Complete — simulation verified |
 | PowerShell module (PSGallery) | Future | After install flow stabilizes |
 | Dedicated adapter repo | Future | If adapter grows beyond TCE scope |
 | Helios monorepo bundle | Future | If unified distribution preferred |

@@ -243,11 +243,51 @@ If installation fails or the user wants to remove Helios:
 ## Post-Install Verification Checklist
 
 - [ ] `Test-HeliosAdapterPackage` passes on the package.
+- [ ] `Test-HeliosRuntimeBundle` passes on the runtime bundle.
 - [ ] `Test-HeliosEnvelopeIntegrity` returns CLEAN on the target.
 - [ ] Bridge byte identity confirmed.
 - [ ] Mutable directories exist.
-- [ ] Manifest and sidecar present and valid.
+- [ ] Manifest and sidecar present, valid, and BOM-free.
 - [ ] settings.json backup exists.
 - [ ] No-gate deny smoke test passes.
 - [ ] Valid-gate allow smoke test passes with full evidence chain.
 - [ ] Install evidence written.
+
+## Two-Package Combined Install (Phase 3.99)
+
+For a complete fresh installation using both packages:
+
+```powershell
+# 1. Build or pull both packages
+$AdapterPkg = "helios-tce-adapter-v0.3.99"
+$RuntimePkg = "helios-runtime-v3.99"
+
+# 2. Verify both packages
+& "$AdapterPkg\tools\Test-HeliosAdapterPackage.ps1" -PackageRoot $AdapterPkg
+& "$AdapterPkg\tools\Test-HeliosRuntimeBundle.ps1" -BundleRoot $RuntimePkg
+
+# 3. Generate combined install plan
+& "$AdapterPkg\tools\New-HeliosCombinedInstallPlan.ps1" `
+    -AdapterPackageRoot $AdapterPkg `
+    -RuntimeBundleRoot $RuntimePkg `
+    -TargetGateRoot "C:\path\to\repo\.command-gate" `
+    -Mode PlanOnly
+
+# 4. Review plan, then execute with Prepare mode
+# 5. Generate local manifest (BOM-free)
+# 6. Verify envelope CLEAN
+# 7. Human approves settings.json activation
+# 8. Run smoke tests
+```
+
+### End-to-End Simulation
+
+Before a real install, run the simulation to verify both packages work together:
+
+```powershell
+& "$AdapterPkg\tools\Test-HeliosEndToEndInstallPlan.ps1" `
+    -AdapterPackageRoot $AdapterPkg `
+    -RuntimeBundleRoot $RuntimePkg
+```
+
+This creates a temporary directory, runs the full install flow, verifies BOM-free manifest/sidecar, checks envelope integrity, and cleans up.

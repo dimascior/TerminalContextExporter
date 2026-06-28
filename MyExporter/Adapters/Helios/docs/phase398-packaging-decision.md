@@ -103,3 +103,14 @@ All of this without merging anything into TCE main.
 | Package builder | tool | `tools/New-HeliosAdapterPackage.ps1` |
 | Package verifier | tool | `tools/Test-HeliosAdapterPackage.ps1` |
 | Install-plan generator | tool | `tools/New-HeliosInstallPlan.ps1` |
+
+## Phase 3.99 Continuation
+
+Phase 3.98 designed the TCE adapter packaging. Phase 3.99 completes the two-package story:
+
+- **BOM hardening**: `New-HeliosEnvelopeManifest.ps1` fixed to use `$Utf8NoBom` for manifest and sidecar writes. `Test-HeliosEnvelopeIntegrity.ps1` now checks for BOM presence.
+- **Runtime bundle packaging**: `New-HeliosRuntimeBundle.ps1` builds a distributable Helios runtime bundle. `Test-HeliosRuntimeBundle.ps1` verifies contents, checksums, and BOM safety.
+- **Combined installer**: `New-HeliosCombinedInstallPlan.ps1` generates a full install plan consuming both the TCE adapter package and Helios runtime bundle.
+- **End-to-end simulation**: `Test-HeliosEndToEndInstallPlan.ps1` simulates a complete install in a temp directory without touching the active runtime.
+- **Operational enforcement observations**: Gate identity enforcement (undeclared chaining, cwd mismatch) observed operationally during Phase 3.98, confirming Phase 3.97 gap-test classifications.
+- **Runtime bundle contract**: `helios-runtime-bundle-contract.md` defines what the runtime bundle includes, excludes, and how it relates to the adapter package.

@@ -35,6 +35,7 @@ $protectedPaths = @(
 )
 
 $sha = [System.Security.Cryptography.SHA256]::Create()
+$Utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 
 $hashes = @{}
 foreach ($relPath in $protectedFiles) {
@@ -77,13 +78,13 @@ if (-not (Test-Path $manifestDir)) {
 
 $manifestPath = Join-Path $manifestDir 'helios-envelope.json'
 $manifestJson = $manifest | ConvertTo-Json -Depth 5
-$manifestJson | Set-Content -LiteralPath $manifestPath -Encoding UTF8 -NoNewline
+[System.IO.File]::WriteAllText($manifestPath, $manifestJson, $Utf8NoBom)
 
 $manifestBytes = [System.IO.File]::ReadAllBytes($manifestPath)
 $manifestHash = ($sha.ComputeHash($manifestBytes) | ForEach-Object { $_.ToString('x2') }) -join ''
 
 $sidecarPath = Join-Path $manifestDir 'helios-envelope.sha256'
-$manifestHash | Set-Content -LiteralPath $sidecarPath -Encoding UTF8 -NoNewline
+[System.IO.File]::WriteAllText($sidecarPath, $manifestHash, $Utf8NoBom)
 
 $result = @{
     timestamp_utc    = (Get-Date).ToUniversalTime().ToString('o')
