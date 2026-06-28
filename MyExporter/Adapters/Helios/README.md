@@ -123,9 +123,45 @@ See `schemas/` for JSON Schema definitions of:
 - `helios-baseline.v1` — session baseline
 - `helios-command-evidence.v1` — before, decision, after, compare evidence
 
+## Packaging
+
+### Distribution
+
+The adapter is distributed from the `helios-integrity-adapter` branch. TCE main is preserved without adapter entries.
+
+**Development:**
+```bash
+git clone -b helios-integrity-adapter https://github.com/<owner>/TerminalContextExporter.git
+```
+
+**Release artifact:**
+```bash
+gh release download v0.3.98 --repo <owner>/TerminalContextExporter
+```
+
+### Package Tools
+
+| Tool | Purpose |
+|---|---|
+| `tools/New-HeliosAdapterPackage.ps1` | Build a distributable package from the adapter branch |
+| `tools/Test-HeliosAdapterPackage.ps1` | Verify package contents and checksums |
+| `tools/New-HeliosInstallPlan.ps1` | Generate install plan for a target machine |
+
+### Install Flow
+
+1. Pull adapter package (git clone or release zip).
+2. Verify package: `Test-HeliosAdapterPackage.ps1 -PackageRoot <path>`.
+3. Generate install plan: `New-HeliosInstallPlan.ps1 -PackageRoot <path> -HeliosTargetRoot <path>`.
+4. Copy bridge, create directories, generate local manifest.
+5. Verify envelope: `Test-HeliosEnvelopeIntegrity.ps1 -HeliosGateRoot <path>`.
+6. Review and approve hook activation in `settings.json`.
+7. Run smoke tests.
+
+See `docs/install-sequence.md` for the complete procedure and `docs/package-architecture.md` for the two-package model.
+
 ## Current Status
 
-**Phase:** 3.97 — gap-test completion and lock-requirement derivation.
+**Phase:** 3.98 — fork-pull packaging and installation architecture.
 
 | Component | Status |
 |---|---|
@@ -138,6 +174,9 @@ See `schemas/` for JSON Schema definitions of:
 | Evidence parser/normalizer | Complete — `tools/ConvertFrom-HeliosEvidence.ps1` |
 | Gap-test matrix (12 tests) | Complete — `evidence/gap-tests/` |
 | Phase 4 lock requirements | Complete — `docs/phase4-lock-requirements-from-gap-tests.md` |
+| Package architecture | Complete — `docs/package-architecture.md` |
+| Package tools (3) | Complete — build, verify, install-plan |
+| Install sequence | Complete — `docs/install-sequence.md` |
 | TCE main preservation | Preserved — main has no adapter entries |
 
 ### Branch Ownership
@@ -151,6 +190,7 @@ See `schemas/` for JSON Schema definitions of:
 |---|---|
 | Phase 0-3.96 | Complete (Helios runtime + TCE bridge) |
 | Phase 3.97 | Complete (TCE gap-tests + lock derivation) |
+| Phase 3.98 | Complete (packaging architecture + install tooling) |
 | Phase 4 | Requirements derived — implementation not started |
 | Phase 5 | Future — helios-lock package |
 | Phase 6 | Future — lock verification evidence |

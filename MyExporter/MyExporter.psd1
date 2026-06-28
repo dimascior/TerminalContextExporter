@@ -83,6 +83,14 @@
         'Adapters\Helios\tools\New-HeliosGapTestMatrix.ps1',
         'Adapters\Helios\docs\tce-helios-integrity-adapter-spec.md',
         'Adapters\Helios\docs\phase4-lock-requirements-from-gap-tests.md',
+        'Adapters\Helios\docs\package-architecture.md',
+        'Adapters\Helios\docs\package-options.md',
+        'Adapters\Helios\docs\install-sequence.md',
+        'Adapters\Helios\docs\package-manifest-schema.md',
+        'Adapters\Helios\docs\phase398-packaging-decision.md',
+        'Adapters\Helios\tools\New-HeliosAdapterPackage.ps1',
+        'Adapters\Helios\tools\Test-HeliosAdapterPackage.ps1',
+        'Adapters\Helios\tools\New-HeliosInstallPlan.ps1',
         'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1'
     )
 
