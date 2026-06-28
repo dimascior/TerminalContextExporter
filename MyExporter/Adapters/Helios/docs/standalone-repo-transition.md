@@ -62,7 +62,7 @@ This preserves per-file commit history but:
 
 ## What the standalone repo contains
 
-From `MyExporter/Adapters/Helios/` on `helios-integrity-adapter` at `2916e3a`:
+From `MyExporter/Adapters/Helios/` on `helios-integrity-adapter` at the final extraction seed commit:
 
 - `HeliosIntegrityBridge.ps1` — 7-function integrity witness bridge
 - `README.md` — adapter documentation with packaging, install, and phase roadmap
