@@ -58,6 +58,10 @@ $RequiredFiles = @(
     'tools\Test-HeliosEnvelopeIntegrity.ps1'
     'tools\Test-HeliosAdapterPackage.ps1'
     'tools\New-HeliosInstallPlan.ps1'
+    'tools\New-HeliosRuntimeBundle.ps1'
+    'tools\Test-HeliosRuntimeBundle.ps1'
+    'tools\New-HeliosCombinedInstallPlan.ps1'
+    'tools\Test-HeliosEndToEndInstallPlan.ps1'
 )
 
 $MissingRequired = @()
@@ -150,11 +154,40 @@ if (Test-Path $ChecksumsPath) {
     Add-Check -Name 'checksums_match' -Passed $false -Detail 'checksums.sha256 not found'
 }
 
+$BomChecks = @{ package_manifest_bom_free = $true; checksums_bom_free = $true; json_bom_free = $true }
+if (Test-Path $ManifestPath) {
+    $mRaw = [System.IO.File]::ReadAllBytes($ManifestPath)
+    if ($mRaw.Length -ge 3 -and $mRaw[0] -eq 0xEF -and $mRaw[1] -eq 0xBB -and $mRaw[2] -eq 0xBF) {
+        $BomChecks.package_manifest_bom_free = $false
+    }
+}
+if (Test-Path $ChecksumsPath) {
+    $cRaw = [System.IO.File]::ReadAllBytes($ChecksumsPath)
+    if ($cRaw.Length -ge 3 -and $cRaw[0] -eq 0xEF -and $cRaw[1] -eq 0xBB -and $cRaw[2] -eq 0xBF) {
+        $BomChecks.checksums_bom_free = $false
+    }
+}
+$BomJsonFiles = @(Get-ChildItem -Path $PackageRoot -Filter '*.json' -Recurse -File -ErrorAction SilentlyContinue)
+$BomJsonFails = @()
+foreach ($jf in $BomJsonFiles) {
+    $jRaw = [System.IO.File]::ReadAllBytes($jf.FullName)
+    if ($jRaw.Length -ge 3 -and $jRaw[0] -eq 0xEF -and $jRaw[1] -eq 0xBB -and $jRaw[2] -eq 0xBF) {
+        $BomJsonFails += $jf.FullName.Substring($PackageRoot.Length + 1)
+    }
+}
+if ($BomJsonFails.Count -gt 0) { $BomChecks.json_bom_free = $false }
+
+Add-Check -Name 'package_manifest_bom_free' -Passed $BomChecks.package_manifest_bom_free -Detail $(if ($BomChecks.package_manifest_bom_free) { 'No BOM' } else { 'BOM DETECTED in package-manifest.json' })
+Add-Check -Name 'checksums_bom_free' -Passed $BomChecks.checksums_bom_free -Detail $(if ($BomChecks.checksums_bom_free) { 'No BOM' } else { 'BOM DETECTED in checksums.sha256' })
+Add-Check -Name 'json_bom_free' -Passed ($BomJsonFails.Count -eq 0) `
+    -Detail $(if ($BomJsonFails.Count -eq 0) { "$($BomJsonFiles.Count) JSON files BOM-free" } else { "BOM found in: $($BomJsonFails -join ', ')" })
+
 $Result = @{
     timestamp_utc = (Get-Date).ToUniversalTime().ToString('o')
     package_root  = $PackageRoot
     verdict       = $Verdict
     checks        = $Checks
+    bom_check     = $BomChecks
     total_checks  = $Checks.Count
     passed_checks = ($Checks | Where-Object { $_.passed }).Count
     failed_checks = ($Checks | Where-Object { -not $_.passed }).Count

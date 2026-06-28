@@ -201,6 +201,14 @@ if ($Mode -eq 'Prepare') {
         }
     }
 
+    $GitkeepDirs = @('pending', 'inflight', 'evidence', 'blocked', 'templates')
+    foreach ($gkDir in $GitkeepDirs) {
+        $gkPath = Join-Path $TargetGateRoot "$gkDir\.gitkeep"
+        if (-not (Test-Path $gkPath)) {
+            [System.IO.File]::WriteAllText($gkPath, '', $Utf8NoBom)
+        }
+    }
+
     foreach ($copy in $RuntimeFileCopyPlan) {
         $destDir = Split-Path $copy.dest -Parent
         if (-not (Test-Path $destDir)) {
@@ -220,6 +228,7 @@ if ($Mode -eq 'Prepare') {
     }
 
     $Plan['prepare_completed'] = $true
+    $Plan['manifest_status'] = 'pending_rebaseline'
 }
 
 $PlanPath = Join-Path $AdapterPackageRoot 'combined-install-plan.json'

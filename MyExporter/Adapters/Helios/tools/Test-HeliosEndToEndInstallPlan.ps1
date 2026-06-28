@@ -65,6 +65,25 @@ try {
                   (Test-Path (Join-Path $SimGateRoot 'blocked'))
     Add-Check -Name 'target_scaffold_created' -Passed $scaffoldOk -Detail $SimGateRoot
 
+    # 4b. Verify .gitkeep files
+    $gitkeepDirs = @('pending', 'inflight', 'evidence', 'blocked', 'templates')
+    $gitkeepMissing = @()
+    foreach ($gkd in $gitkeepDirs) {
+        $gkp = Join-Path $SimGateRoot "$gkd\.gitkeep"
+        if (-not (Test-Path $gkp)) { $gitkeepMissing += "$gkd/.gitkeep" }
+    }
+    Add-Check -Name 'gitkeep_files_created' -Passed ($gitkeepMissing.Count -eq 0) `
+        -Detail $(if ($gitkeepMissing.Count -eq 0) { "$($gitkeepDirs.Count) .gitkeep files present" } else { "Missing: $($gitkeepMissing -join ', ')" })
+
+    # 4c. Verify protected runtime files copied
+    $protectedFiles = @('hooks\helios_pretooluse.ps1', 'hooks\gate_check.ps1', 'hooks\evidence_capture.ps1', 'hooks\tier_classifier.ps1', 'policy\command-policy.json')
+    $protMissing = @()
+    foreach ($pf in $protectedFiles) {
+        if (-not (Test-Path (Join-Path $SimGateRoot $pf))) { $protMissing += $pf }
+    }
+    Add-Check -Name 'protected_files_copied' -Passed ($protMissing.Count -eq 0) `
+        -Detail $(if ($protMissing.Count -eq 0) { "$($protectedFiles.Count) protected files present" } else { "Missing: $($protMissing -join ', ')" })
+
     # 5. Verify bridge copied
     $bridgeDest = Join-Path $SimGateRoot 'hooks\lib\HeliosIntegrityBridge.ps1'
     $bridgeSource = Join-Path $AdapterPackageRoot 'HeliosIntegrityBridge.ps1'

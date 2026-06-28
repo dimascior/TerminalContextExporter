@@ -48,6 +48,8 @@ $AdapterFiles = @(
     @{ Source = 'docs\install-sequence.md'; Role = 'doc'; Required = $true }
     @{ Source = 'docs\package-manifest-schema.md'; Role = 'doc'; Required = $false }
     @{ Source = 'docs\phase398-packaging-decision.md'; Role = 'doc'; Required = $false }
+    @{ Source = 'docs\helios-runtime-bundle-contract.md'; Role = 'doc'; Required = $false }
+    @{ Source = 'docs\phase399-operational-enforcement-observations.md'; Role = 'doc'; Required = $false }
     @{ Source = 'schemas\helios-envelope.schema.json'; Role = 'schema'; Required = $true }
     @{ Source = 'schemas\helios-baseline.schema.json'; Role = 'schema'; Required = $true }
     @{ Source = 'schemas\helios-command-evidence.schema.json'; Role = 'schema'; Required = $true }
@@ -60,6 +62,10 @@ $AdapterFiles = @(
     @{ Source = 'tools\New-HeliosAdapterPackage.ps1'; Role = 'tool'; Required = $false }
     @{ Source = 'tools\Test-HeliosAdapterPackage.ps1'; Role = 'tool'; Required = $true }
     @{ Source = 'tools\New-HeliosInstallPlan.ps1'; Role = 'tool'; Required = $true }
+    @{ Source = 'tools\New-HeliosRuntimeBundle.ps1'; Role = 'tool'; Required = $true }
+    @{ Source = 'tools\Test-HeliosRuntimeBundle.ps1'; Role = 'tool'; Required = $true }
+    @{ Source = 'tools\New-HeliosCombinedInstallPlan.ps1'; Role = 'tool'; Required = $true }
+    @{ Source = 'tools\Test-HeliosEndToEndInstallPlan.ps1'; Role = 'tool'; Required = $true }
     @{ Source = 'Tests\HeliosIntegrityBridge.Tests.ps1'; Role = 'test'; Required = $false }
 )
 

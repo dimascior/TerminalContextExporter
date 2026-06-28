@@ -98,6 +98,68 @@ $NoBridge = -not (Test-Path $BridgePath)
 Add-Check -Name 'no_bundled_bridge' -Passed $NoBridge `
     -Detail $(if ($NoBridge) { 'Bridge correctly excluded (installed from TCE adapter)' } else { 'Bridge found in bundle — should be installed from adapter package' })
 
+if ($Manifest) {
+    $filesEntries = @()
+    if ($Manifest.files) { foreach ($f in $Manifest.files) { $filesEntries += $f.path } }
+    $hashKeys = @()
+    if ($Manifest.file_hashes) { foreach ($p in $Manifest.file_hashes.PSObject.Properties) { $hashKeys += $p.Name } }
+
+    $MissingOnDisk = @()
+    $MissingInHashes = @()
+    foreach ($fp in $filesEntries) {
+        $fullPath = Join-Path $BundleRoot ($fp -replace '/', '\')
+        if (-not (Test-Path $fullPath)) { $MissingOnDisk += $fp }
+        if ($hashKeys -notcontains $fp) { $MissingInHashes += $fp }
+    }
+    Add-Check -Name 'files_exist_on_disk' -Passed ($MissingOnDisk.Count -eq 0) `
+        -Detail $(if ($MissingOnDisk.Count -eq 0) { "$($filesEntries.Count) files[] entries exist" } else { "Missing: $($MissingOnDisk -join ', ')" })
+    Add-Check -Name 'files_have_hashes' -Passed ($MissingInHashes.Count -eq 0) `
+        -Detail $(if ($MissingInHashes.Count -eq 0) { "$($filesEntries.Count) files[] entries have file_hashes" } else { "No hash: $($MissingInHashes -join ', ')" })
+
+    $checksumPath = Join-Path $BundleRoot 'runtime-checksums.sha256'
+    if (Test-Path $checksumPath) {
+        $csLines = (Get-Content -LiteralPath $checksumPath) | Where-Object { $_.Trim() -ne '' }
+        $csEntries = @()
+        foreach ($ln in $csLines) { $p = $ln -split '  ', 2; if ($p.Count -eq 2) { $csEntries += $p[1].Trim() } }
+        $MissingInChecksums = @()
+        foreach ($hk in $hashKeys) {
+            if ($csEntries -notcontains $hk) { $MissingInChecksums += $hk }
+        }
+        Add-Check -Name 'hashes_in_checksums' -Passed ($MissingInChecksums.Count -eq 0) `
+            -Detail $(if ($MissingInChecksums.Count -eq 0) { "$($hashKeys.Count) file_hashes entries in checksums" } else { "Missing from checksums: $($MissingInChecksums -join ', ')" })
+    }
+}
+
+$ManifestBomFree = $true
+$ChecksumsBomFree = $true
+if (Test-Path $ManifestPath) {
+    $mRaw = [System.IO.File]::ReadAllBytes($ManifestPath)
+    if ($mRaw.Length -ge 3 -and $mRaw[0] -eq 0xEF -and $mRaw[1] -eq 0xBB -and $mRaw[2] -eq 0xBF) {
+        $ManifestBomFree = $false
+    }
+}
+Add-Check -Name 'manifest_bom_free' -Passed $ManifestBomFree -Detail $(if ($ManifestBomFree) { 'No BOM' } else { 'BOM DETECTED in runtime-manifest.json' })
+$csFile = Join-Path $BundleRoot 'runtime-checksums.sha256'
+if (Test-Path $csFile) {
+    $csRaw = [System.IO.File]::ReadAllBytes($csFile)
+    if ($csRaw.Length -ge 3 -and $csRaw[0] -eq 0xEF -and $csRaw[1] -eq 0xBB -and $csRaw[2] -eq 0xBF) {
+        $ChecksumsBomFree = $false
+    }
+}
+Add-Check -Name 'checksums_bom_free' -Passed $ChecksumsBomFree -Detail $(if ($ChecksumsBomFree) { 'No BOM' } else { 'BOM DETECTED in runtime-checksums.sha256' })
+
+$MutableGitkeepOk = $true
+$MutableGitkeepDetail = @()
+foreach ($dir in $MutableDirs) {
+    $gk = Join-Path $BundleRoot "$dir\.gitkeep"
+    if (-not (Test-Path $gk)) {
+        $MutableGitkeepOk = $false
+        $MutableGitkeepDetail += "$dir/.gitkeep missing"
+    }
+}
+Add-Check -Name 'mutable_gitkeep_present' -Passed $MutableGitkeepOk `
+    -Detail $(if ($MutableGitkeepOk) { '4 mutable dirs have .gitkeep' } else { $MutableGitkeepDetail -join '; ' })
+
 $BomFiles = @()
 $JsonFiles = @(Get-ChildItem -Path $BundleRoot -Filter '*.json' -Recurse -File -ErrorAction SilentlyContinue)
 foreach ($jf in $JsonFiles) {

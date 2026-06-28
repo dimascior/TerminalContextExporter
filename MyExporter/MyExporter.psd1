@@ -97,7 +97,9 @@
         'Adapters\Helios\tools\Test-HeliosRuntimeBundle.ps1',
         'Adapters\Helios\tools\New-HeliosCombinedInstallPlan.ps1',
         'Adapters\Helios\tools\Test-HeliosEndToEndInstallPlan.ps1',
-        'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1'
+        'Adapters\Helios\Tests\HeliosIntegrityBridge.Tests.ps1',
+        'Adapters\Helios\docs\phase3991-package-validation-results.md',
+        'Adapters\Helios\evidence\package-validation\phase3991-validation-summary.json'
     )
 
     # --- Module Metadata ---

@@ -165,7 +165,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 
 ## Current Status
 
-**Phase:** 3.99 — runtime bundle packaging and BOM hardening.
+**Phase:** 3.99.1 — package validation, manifest hardening, end-to-end execution proof.
 
 | Component | Status |
 |---|---|
@@ -184,6 +184,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | Combined installer | Complete — `tools/New-HeliosCombinedInstallPlan.ps1` |
 | End-to-end simulation | Complete — `tools/Test-HeliosEndToEndInstallPlan.ps1` |
 | BOM hardening | Complete — manifest/sidecar writes BOM-free, integrity check includes BOM detection |
+| Package validation (3.99.1) | Complete — adapter verifier BOM checks, runtime manifest completeness, e2e execution |
 | Install sequence | Complete — `docs/install-sequence.md` |
 | TCE main preservation | Preserved — main has no adapter entries |
 
@@ -200,6 +201,7 @@ See `docs/install-sequence.md` for the complete procedure and `docs/package-arch
 | Phase 3.97 | Complete (TCE gap-tests + lock derivation) |
 | Phase 3.98 | Complete (packaging architecture + install tooling) |
 | Phase 3.99 | Complete (runtime bundle + BOM hardening + e2e simulation) |
+| Phase 3.99.1 | Complete (package validation + manifest hardening + execution proof) |
 | Phase 4 | Requirements derived — implementation not started |
 | Phase 5 | Future — helios-lock package |
 | Phase 6 | Future — lock verification evidence |

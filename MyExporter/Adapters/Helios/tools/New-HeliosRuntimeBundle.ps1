@@ -62,6 +62,15 @@ $ChecksumLines = @()
 $FileEntries = @()
 $CopiedCount = 0
 
+function Add-TrackedFile {
+    param([string]$Path, [string]$RelPath, [string]$Role, [bool]$Required)
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    $hash = ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') }) -join ''
+    $script:FileHashes[$RelPath] = $hash
+    $script:ChecksumLines += "$hash  $RelPath"
+    $script:FileEntries += @{ path = $RelPath; role = $Role; required = $Required }
+}
+
 foreach ($relPath in $ProtectedFiles) {
     $sourcePath = Join-Path $GateRoot $relPath
     if (-not (Test-Path $sourcePath)) {
@@ -73,11 +82,7 @@ foreach ($relPath in $ProtectedFiles) {
         New-Item -ItemType Directory -Path $destDir -Force | Out-Null
     }
     Copy-Item -LiteralPath $sourcePath -Destination $destPath -Force
-    $bytes = [System.IO.File]::ReadAllBytes($destPath)
-    $hash = ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') }) -join ''
-    $FileHashes[$relPath] = $hash
-    $ChecksumLines += "$hash  $relPath"
-    $FileEntries += @{ path = $relPath; role = 'protected'; required = $true }
+    Add-TrackedFile -Path $destPath -RelPath $relPath -Role 'protected' -Required $true
     $CopiedCount++
 }
 
@@ -93,11 +98,7 @@ foreach ($sd in $SupportDirs) {
             New-Item -ItemType Directory -Path $destDir -Force | Out-Null
         }
         Copy-Item -LiteralPath $f.FullName -Destination $destPath -Force
-        $bytes = [System.IO.File]::ReadAllBytes($destPath)
-        $hash = ($sha.ComputeHash($bytes) | ForEach-Object { $_.ToString('x2') }) -join ''
-        $FileHashes[$relPath] = $hash
-        $ChecksumLines += "$hash  $relPath"
-        $FileEntries += @{ path = $relPath; role = 'support'; required = $false }
+        Add-TrackedFile -Path $destPath -RelPath $relPath -Role 'support' -Required $false
         $CopiedCount++
     }
 }
@@ -110,7 +111,7 @@ foreach ($dir in $MutableDirs) {
     $gitkeep = Join-Path $path '.gitkeep'
     [System.IO.File]::WriteAllText($gitkeep, '', $Utf8NoBom)
     $relPath = "$dir\.gitkeep"
-    $FileEntries += @{ path = $relPath; role = 'mutable_scaffold'; required = $true }
+    Add-TrackedFile -Path $gitkeep -RelPath $relPath -Role 'mutable_scaffold' -Required $true
 }
 
 foreach ($dir in $ScaffoldDirs) {
@@ -124,6 +125,7 @@ $templateGitkeep = Join-Path $BundleDir 'templates\.gitkeep'
 if (-not (Test-Path $templateGitkeep)) {
     [System.IO.File]::WriteAllText($templateGitkeep, '', $Utf8NoBom)
 }
+Add-TrackedFile -Path $templateGitkeep -RelPath 'templates\.gitkeep' -Role 'mutable_scaffold' -Required $true
 
 $Manifest = [ordered]@{
     schema_version      = 'helios-runtime-bundle.v1'
